@@ -144,13 +144,33 @@ winget install OpenJS.NodeJS.LTS
 
 Tutup dan buka kembali Kiro setelah proses selesai.
 
-### macOS
+### macOS — installer grafis, direkomendasikan untuk pemula
 
-Gunakan installer LTS dari [Node.js Downloads](https://nodejs.org/en/download), atau jika Homebrew sudah tersedia:
+1. Buka [Node.js Downloads](https://nodejs.org/en/download).
+2. Pilih rilis **LTS**, bukan Current.
+3. Unduh macOS Installer `.pkg`. Arsitektur biasanya terdeteksi otomatis; jika diminta memilih, gunakan **ARM64** untuk Mac Apple Silicon (M1 dan seterusnya) atau **x64** untuk Mac Intel.
+4. Jalankan installer dan ikuti wizard. npm ikut terpasang.
+5. Tutup dan buka kembali Kiro setelah instalasi agar `PATH` terbaca.
+
+### macOS — menggunakan Homebrew
+
+Cek dahulu apakah Homebrew tersedia, lalu pasang Node.js:
 
 ```bash
+brew --version
 brew install node
 ```
+
+Jika `brew --version` gagal, Homebrew belum terpasang. Gunakan installer `.pkg` di atas. Memasang Homebrew saat workshop berlangsung memakan waktu terlalu lama.
+
+Setelah instalasi, tutup dan buka kembali Kiro.
+
+### Catatan khusus macOS
+
+- Terminal default di macOS memakai **zsh**. Semua command lab tetap sama.
+- Jika `brew` terpasang tetapi `node` tidak ditemukan pada Mac Apple Silicon, biasanya `PATH` Homebrew belum aktif. Homebrew berada di `/opt/homebrew/bin` untuk Apple Silicon dan `/usr/local/bin` untuk Intel. Restart Kiro terlebih dahulu sebelum menyunting file profil.
+- Peserta yang sudah memakai `nvm` boleh melanjutkan dengan `nvm install --lts`, tetapi pastikan terminal Kiro memuat `nvm`.
+- Kiro perlu izin akses folder saat pertama kali membuka project. Setujui prompt macOS agar `File → Open Folder` berfungsi normal.
 
 ### Linux atau WSL
 
@@ -179,13 +199,14 @@ Jika command tidak ditemukan:
 1. Tutup seluruh terminal dan restart Kiro.
 2. Pastikan Node.js telah ditambahkan ke `PATH`.
 3. Pada Windows, coba restart komputer setelah installer selesai.
-4. Jalankan kembali `node --version` dan `npm --version`.
+4. Pada macOS, buka jendela terminal baru. Jika memakai Homebrew atau `nvm`, pastikan terminal Kiro memuat profil shell Anda.
+5. Jalankan kembali `node --version` dan `npm --version`.
 
 ## Menjalankan website guide ini
 
 Website guide tidak memiliki dependency atau build step. Anda dapat membuka `index.html` langsung di browser.
 
-Untuk clipboard dan routing yang lebih konsisten, jalankan static server dari root repository:
+Untuk clipboard dan routing yang lebih konsisten, jalankan static server dari root repository. macOS dan Linux sudah menyertakan `python3`:
 
 ```bash
 python3 -m http.server 8080
@@ -195,6 +216,12 @@ Jika Windows hanya menyediakan command `python`, gunakan:
 
 ```powershell
 python -m http.server 8080
+```
+
+Alternatif lintas platform bila Node.js sudah terpasang:
+
+```bash
+npx --yes serve .
 ```
 
 Kemudian buka:
@@ -353,6 +380,22 @@ Build yang berhasil tanpa smoke test hanya berarti **implementation ready for ac
 ### Port sudah digunakan
 
 Jika port `5173` atau `3001` sedang digunakan, hentikan process lama dengan `Ctrl + C`. Jangan mengubah port dalam workshop tanpa memperbarui design karena proxy telah dikunci ke port `3001`.
+
+Jika terminal lama sudah tertutup, cari process yang memakai port tersebut.
+
+macOS atau Linux:
+
+```bash
+lsof -ti :3001
+```
+
+Windows PowerShell:
+
+```powershell
+Get-NetTCPConnection -LocalPort 3001 | Select-Object -Property OwningProcess
+```
+
+Hentikan process hasil pencarian tersebut sebelum menjalankan `npm run dev` lagi. Periksa dulu bahwa process itu memang milik lab ini, bukan aplikasi lain yang sedang Anda pakai.
 
 ### `npm install` gagal
 

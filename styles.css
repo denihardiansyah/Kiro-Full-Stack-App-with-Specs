@@ -224,7 +224,7 @@ tr:last-child td { border-bottom: 0; }
 .execution-list { display: grid; gap: 10px; margin: 25px 0 35px; }
 .execution-item { display: grid; grid-template-columns: 42px 1fr auto; align-items: center; gap: 15px; padding: 17px; background: var(--surface-alt); border: 1px solid var(--line); border-radius: var(--radius-md); }
 .execution-item > span { display: grid; place-items: center; width: 35px; height: 35px; color: #fff; background: var(--navy-800); border-radius: 8px; font-weight: 900; }
-.execution-item h2 { margin: 0 0 3px; font-size: 16px; }
+.execution-item h2, .execution-item h4 { margin: 0 0 3px; font-size: 16px; }
 .execution-item p { margin: 0; color: var(--ink-700); font-size: 13px; }
 .execution-item em { color: var(--ink-500); font-size: 11px; white-space: nowrap; }
 .test-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 24px 0 38px; }

@@ -156,10 +156,10 @@
 
             <h3>Cara kerja aplikasi</h3>
             <div class="execution-list">
-              <div class="execution-item"><span>1</span><div><h2>Load</h2><p>Halaman dibuka → <code>GET /api/tasks</code> → React menampilkan daftar atau empty state.</p></div><em>Story 1</em></div>
-              <div class="execution-item"><span>2</span><div><h2>Create</h2><p>Pengguna mengisi judul → <code>POST /api/tasks</code> → server memvalidasi → task baru tampil.</p></div><em>Story 2</em></div>
-              <div class="execution-item"><span>3</span><div><h2>Toggle</h2><p>Pengguna memilih task → <code>PATCH /api/tasks/:id/toggle</code> → status diperbarui.</p></div><em>Story 3</em></div>
-              <div class="execution-item"><span>4</span><div><h2>Restart</h2><p>API dihentikan atau dimulai ulang → array kembali kosong. Ini perilaku yang disengaja.</p></div><em>By design</em></div>
+              <div class="execution-item"><span>1</span><div><h4>Load</h4><p>Halaman dibuka → <code>GET /api/tasks</code> → React menampilkan daftar atau empty state.</p></div><em>Story 1</em></div>
+              <div class="execution-item"><span>2</span><div><h4>Create</h4><p>Pengguna mengisi judul → <code>POST /api/tasks</code> → server memvalidasi → task baru tampil.</p></div><em>Story 2</em></div>
+              <div class="execution-item"><span>3</span><div><h4>Toggle</h4><p>Pengguna memilih task → <code>PATCH /api/tasks/:id/toggle</code> → status diperbarui.</p></div><em>Story 3</em></div>
+              <div class="execution-item"><span>4</span><div><h4>Restart</h4><p>API dihentikan atau dimulai ulang → array kembali kosong. Ini perilaku yang disengaja.</p></div><em>By design</em></div>
             </div>
             <aside class="callout callout--info"><span class="callout__icon">i</span><div><strong>Data disimpan di laptop Anda, bukan di browser</strong><p>Task hidup di memory proses Node.js. Refresh browser tidak menghapus data, tetapi menghentikan atau me-restart server akan mengosongkan daftar task.</p></div></aside>
             <aside class="callout callout--warning"><span class="callout__icon">!</span><div><strong>Bukan bagian workshop</strong><p>Tidak ada login, database, edit/delete, search, filter, pagination, Docker, deployment cloud, atau test framework. Peserta hanya membangun vertical slice inti.</p></div></aside>
@@ -216,14 +216,27 @@
           <header class="module-header"><span class="eyebrow">Modul 3 · 5 menit</span><h1>Siapkan workspace kosong</h1><p>Kita sengaja memulai dari folder kosong agar artefak dan kode dihasilkan dari spec yang sama.</p></header>
 
           <ol class="steps">
-            <li><div class="step-number">1</div><div><h2>Instal Node.js LTS dan npm</h2><p>Lakukan langkah ini sebelum workshop. Untuk Windows pemula, unduh installer <strong>LTS</strong> dari <a href="https://nodejs.org/en/download" target="_blank" rel="noopener noreferrer">Node.js Downloads</a>. npm ikut terpasang bersama Node.js. Alternatif Windows dengan winget:</p>
+            <li><div class="step-number">1</div><div><h2>Instal Node.js LTS dan npm</h2><p>Lakukan langkah ini sebelum workshop. Unduh rilis <strong>LTS</strong> dari <a href="https://nodejs.org/en/download" target="_blank" rel="noopener noreferrer">Node.js Downloads</a>. npm ikut terpasang bersama Node.js.</p>
+
+              <h3>Windows</h3>
+              <p>Jalankan Windows Installer <code>.msi</code> dan pertahankan pilihan default, termasuk penambahan Node.js ke <code>PATH</code>. Alternatif dengan winget:</p>
               <div class="code-block"><div class="code-block__bar"><span>PowerShell / Windows Terminal</span><button class="copy-button" type="button" data-copy-target="cmd-node-install">Copy</button></div><pre id="cmd-node-install"><code>winget install OpenJS.NodeJS.LTS</code></pre></div>
-              <p class="muted">macOS/Linux/WSL: gunakan installer atau version manager LTS yang direkomendasikan pada halaman Node.js Downloads. Setelah instalasi, tutup dan buka kembali Kiro.</p>
+
+              <h3>macOS</h3>
+              <p>Cara termudah: unduh macOS Installer <code>.pkg</code> versi LTS lalu ikuti wizard. Jika diminta memilih arsitektur, gunakan <strong>ARM64</strong> untuk Mac Apple Silicon atau <strong>x64</strong> untuk Mac Intel. Jika Homebrew sudah tersedia, Anda juga bisa memakai:</p>
+              <div class="code-block"><div class="code-block__bar"><span>Terminal · macOS</span><button class="copy-button" type="button" data-copy-target="cmd-node-macos">Copy</button></div><pre id="cmd-node-macos"><code>brew --version
+brew install node</code></pre></div>
+              <p class="muted">Jika <code>brew</code> belum terpasang, gunakan installer <code>.pkg</code>. Memasang Homebrew saat workshop berjalan terlalu lama. Terminal macOS memakai zsh, tetapi seluruh command lab tetap sama.</p>
+
+              <h3>Linux atau WSL</h3>
+              <p class="muted">Gunakan installer atau version manager LTS yang direkomendasikan pada halaman Node.js Downloads. Hindari package distro yang terlalu lama karena bisa tidak kompatibel dengan Vite.</p>
+              <p>Setelah instalasi pada sistem operasi apa pun, tutup dan buka kembali Kiro agar <code>PATH</code> terbaca.</p>
             </div></li>
             <li><div class="step-number">2</div><div><h2>Verifikasi Node.js dan npm</h2><p>Buka terminal baru di Kiro dan jalankan:</p>
               <div class="code-block"><div class="code-block__bar"><span>Terminal</span><button class="copy-button" type="button" data-copy-target="cmd-versions">Copy</button></div><pre id="cmd-versions"><code>node --version
 npm --version</code></pre></div>
-              <p>Kedua command harus menampilkan nomor versi. Jika muncul <code>not recognized</code> atau <code>command not found</code>, restart Kiro dan pastikan Node.js tersedia pada <code>PATH</code>.</p>
+              <p>Kedua command harus menampilkan nomor versi. Jika muncul <code>not recognized</code> pada Windows atau <code>command not found</code> pada macOS/Linux, restart Kiro lalu buka terminal baru dan pastikan Node.js tersedia pada <code>PATH</code>.</p>
+              <p class="muted">Khusus macOS: jika memakai Homebrew atau <code>nvm</code>, pastikan terminal Kiro memuat profil shell Anda. Homebrew berada di <code>/opt/homebrew/bin</code> pada Apple Silicon dan <code>/usr/local/bin</code> pada Intel.</p>
             </div></li>
             <li><div class="step-number">3</div><div><h2>Buat folder project</h2><p>Buat folder bernama <code>kiro-task-tracker</code>, lalu buka folder tersebut melalui <strong>File → Open Folder</strong> di Kiro.</p>
               <div class="code-block"><div class="code-block__bar"><span>Struktur awal</span></div><pre><code>kiro-task-tracker/
@@ -353,6 +366,7 @@ Jangan refactor, menambah dependency, mengubah styling, atau menambahkan fitur b
 npm run dev</code></pre></div>
           <div class="table-wrap"><table><thead><tr><th>Komponen</th><th>URL</th><th>Fungsi</th></tr></thead><tbody><tr><td>React Client</td><td><code>http://localhost:5173</code></td><td>UI Task Tracker</td></tr><tr><td>Express API</td><td><code>http://localhost:3001/api/tasks</code></td><td>JSON task endpoint</td></tr></tbody></table></div>
           <p>Buka <code>http://localhost:5173</code> di browser. Biarkan terminal tetap terbuka selama smoke test. Untuk menghentikan Client dan API, fokuskan terminal lalu tekan <code>Ctrl + C</code>.</p>
+          <p class="muted">Pada macOS gunakan <code>Ctrl + C</code>, bukan <code>Cmd + C</code>. Jika port masih terpakai karena terminal lama tertutup, periksa dengan <code>lsof -ti :3001</code> pada macOS/Linux atau <code>Get-NetTCPConnection -LocalPort 3001</code> pada Windows PowerShell, lalu hentikan process tersebut setelah memastikan itu milik lab ini.</p>
           <aside class="callout callout--info"><span class="callout__icon">i</span><div><strong>Data tidak persistent</strong><p>Task disimpan pada array in-memory. Menghentikan atau me-restart API akan menghapus seluruh task; ini adalah acceptance criterion, bukan bug.</p></div></aside>
           <p class="muted">Development server adalah proses jangka panjang dan harus dijalankan manual pada terminal Kiro. Jangan mengubah port atau menambahkan CORS package; Vite proxy sudah diarahkan ke API port 3001.</p>
 
