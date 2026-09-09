@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="id" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Panduan hands-on 60 menit membangun Task Tracker full-stack dengan Spec-Driven Development di Kiro.">
+  <meta name="theme-color" content="#151e2d">
+  <title>Kiro Builder Lab — Full-Stack dengan Spec-Driven Development</title>
+  <link rel="stylesheet" href="styles.css">
+  <script>document.documentElement.classList.remove('no-js');document.documentElement.classList.add('js');</script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#workshop-content">Lewati ke konten utama</a>
+
+  <header class="topbar">
+    <div class="topbar__brand">
+      <button class="icon-button menu-toggle" id="menu-toggle" type="button" aria-label="Buka navigasi modul" aria-controls="workshop-sidebar" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <a class="brand" href="#welcome" data-nav-link>
+        <span class="brand__mark" aria-hidden="true">K</span>
+        <span><strong>Kiro Builder Lab</strong><small>Community workshop guide</small></span>
+      </a>
+    </div>
+    <div class="topbar__actions">
+      <span class="time-pill"><span aria-hidden="true">◷</span> 60 menit</span>
+      <button class="icon-button" id="theme-toggle" type="button" aria-label="Ganti tema" title="Ganti tema">
+        <span class="theme-icon" aria-hidden="true">☾</span>
+      </button>
+      <a class="button button--primary button--small" href="https://kiro.dev/downloads/" target="_blank" rel="noopener noreferrer">Unduh Kiro <span aria-hidden="true">↗</span></a>
+    </div>
+  </header>
+
+  <div class="workshop-shell">
+    <aside class="sidebar" id="workshop-sidebar" aria-label="Navigasi workshop">
+      <div class="sidebar__inner">
+        <div class="sidebar__heading">
+          <span class="eyebrow">Hands-on lab</span>
+          <h2>Full-Stack App with Specs</h2>
+        </div>
+
+        <div class="progress-summary" aria-label="Progress workshop">
+          <div class="progress-summary__labels"><span>Progress</span><strong id="progress-label">0%</strong></div>
+          <div class="progress-track" role="progressbar" aria-label="Progress modul" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="progress-bar"></span></div>
+          <small id="progress-detail">0 dari 9 modul selesai</small>
+        </div>
+
+        <nav class="module-nav">
+          <ol>
+            <li><a href="#welcome" data-nav-link data-module-link="welcome"><span class="module-nav__status">1</span><span><strong>Mulai di sini</strong><small>3 menit</small></span></a></li>
+            <li><a href="#setup" data-nav-link data-module-link="setup"><span class="module-nav__status">2</span><span><strong>Registrasi & setup</strong><small>7 menit</small></span></a></li>
+            <li><a href="#workspace" data-nav-link data-module-link="workspace"><span class="module-nav__status">3</span><span><strong>Siapkan workspace</strong><small>5 menit</small></span></a></li>
+            <li><a href="#requirements" data-nav-link data-module-link="requirements"><span class="module-nav__status">4</span><span><strong>Requirements</strong><small>10 menit</small></span></a></li>
+            <li><a href="#design" data-nav-link data-module-link="design"><span class="module-nav__status">5</span><span><strong>Design</strong><small>7 menit</small></span></a></li>
+            <li><a href="#tasks" data-nav-link data-module-link="tasks"><span class="module-nav__status">6</span><span><strong>Implementation tasks</strong><small>5 menit</small></span></a></li>
+            <li><a href="#implementation" data-nav-link data-module-link="implementation"><span class="module-nav__status">7</span><span><strong>Build aplikasi</strong><small>15 menit</small></span></a></li>
+            <li><a href="#validation" data-nav-link data-module-link="validation"><span class="module-nav__status">8</span><span><strong>Validasi</strong><small>5 menit</small></span></a></li>
+            <li><a href="#finish" data-nav-link data-module-link="finish"><span class="module-nav__status">9</span><span><strong>Credit review</strong><small>3 menit</small></span></a></li>
+          </ol>
+        </nav>
+
+        <div class="sidebar__footer">
+          <a href="https://kiro.dev/docs/specs/" target="_blank" rel="noopener noreferrer">Dokumentasi Kiro Specs <span aria-hidden="true">↗</span></a>
+          <button class="text-button" id="reset-progress" type="button">Reset progress lab</button>
+        </div>
+      </div>
+    </aside>
+    <div class="sidebar-backdrop" id="sidebar-backdrop" hidden></div>
+
+    <main id="workshop-content" class="content" tabindex="-1">
+      <div class="content__inner">
+        <div class="breadcrumb" aria-label="Breadcrumb"><span>Workshop</span><span aria-hidden="true">›</span><strong id="breadcrumb-current">Mulai di sini</strong></div>
+
+        <article class="module is-active" id="welcome" data-module="welcome" data-title="Mulai di sini">
+          <div class="hero">
+            <div class="hero__content">
+              <span class="eyebrow eyebrow--accent">Hands-on lab · Beginner</span>
+              <h1>Building a Full-Stack App with <span>Spec-Driven Development</span></h1>
+              <p class="hero__lead">Gunakan Kiro untuk mengubah ide menjadi requirements, design, implementation tasks, lalu aplikasi Task Tracker yang bekerja—dalam satu alur yang dapat ditinjau.</p>
+              <div class="hero__meta">
+                <span><strong>60</strong> menit</span>
+                <span><strong>9</strong> modul</span>
+                <span><strong>≤50</strong> credit guardrail</span>
+              </div>
+            </div>
+            <div class="hero__visual" aria-hidden="true">
+              <div class="spec-flow">
+                <div><span>01</span><strong>Requirements</strong><small>Apa yang dibangun?</small></div>
+                <i>→</i>
+                <div><span>02</span><strong>Design</strong><small>Bagaimana caranya?</small></div>
+                <i>→</i>
+                <div><span>03</span><strong>Tasks</strong><small>Langkah implementasi</small></div>
+              </div>
+            </div>
+          </div>
+
+          <section>
+            <h2>Yang akan Anda bangun</h2>
+            <p><strong>Task Tracker full-stack satu halaman.</strong> Frontend React, backend Express, dan penyimpanan in-memory di laptop Anda. Pengguna dapat melihat daftar task, menambahkan task baru, dan menandai task selesai.</p>
+
+            <h3>Tampilan akhir aplikasi</h3>
+            <figure class="app-preview">
+              <div class="app-preview__frame">
+                <div class="app-preview__bar"><span></span><span></span><span></span><em>localhost:5173</em></div>
+                <div class="app-preview__body">
+                  <p class="app-preview__title">Task Tracker</p>
+                  <div class="app-preview__form">
+                    <div class="app-preview__input">Tulis judul task…</div>
+                    <div class="app-preview__button">Add task</div>
+                  </div>
+                  <ul class="app-preview__list">
+                    <li><span class="app-preview__check" aria-hidden="true">☐</span><span class="app-preview__label">Learn Kiro Specs</span><span class="app-preview__state">belum selesai</span></li>
+                    <li class="is-done"><span class="app-preview__check" aria-hidden="true">☑</span><span class="app-preview__label">Review requirements</span><span class="app-preview__state">selesai</span></li>
+                    <li><span class="app-preview__check" aria-hidden="true">☐</span><span class="app-preview__label">Run smoke test</span><span class="app-preview__state">belum selesai</span></li>
+                  </ul>
+                  <p class="app-preview__hint">Empty state, loading, dan pesan error juga ditangani.</p>
+                </div>
+              </div>
+              <figcaption>Satu halaman, satu form, satu daftar task. Tanpa login dan tanpa halaman lain.</figcaption>
+            </figure>
+
+            <h3>Tiga user story</h3>
+            <ul class="check-list">
+              <li>Sebagai pengguna, saya ingin <strong>melihat</strong> semua task saya.</li>
+              <li>Sebagai pengguna, saya ingin <strong>menambahkan</strong> task dengan judul wajib.</li>
+              <li>Sebagai pengguna, saya ingin <strong>menandai</strong> task selesai atau belum selesai.</li>
+            </ul>
+            <div class="architecture" aria-label="Arsitektur aplikasi">
+              <div class="architecture__node"><span class="node-icon">UI</span><strong>React</strong><small>Task form & list</small></div>
+              <div class="architecture__connector"><span>HTTP / JSON</span><i>→</i></div>
+              <div class="architecture__node"><span class="node-icon">API</span><strong>Express</strong><small>3 endpoints</small></div>
+              <div class="architecture__connector"><span>Read / write</span><i>→</i></div>
+              <div class="architecture__node"><span class="node-icon">DB</span><strong>Memory</strong><small>Task store</small></div>
+            </div>
+
+            <h3>High-Level Design (HLD)</h3>
+            <p>Browser menjalankan satu halaman React pada port <code>5173</code>. Native <code>fetch</code> mengirim request JSON melalui proxy Vite ke Express pada port <code>3001</code>. Express membaca dan mengubah satu array <code>Task</code> di memory.</p>
+            <div class="table-wrap"><table><thead><tr><th>Layer</th><th>Tanggung jawab</th><th>Batas scope</th></tr></thead><tbody><tr><td>React Client</td><td>Form, list, loading, empty, validation, dan error state</td><td>Satu halaman; tanpa router/global store</td></tr><tr><td>Vite Proxy</td><td>Meneruskan <code>/api/*</code> ke port 3001</td><td>Tanpa CORS package</td></tr><tr><td>Express API</td><td>List, create, dan toggle task</td><td>Tepat tiga endpoint</td></tr><tr><td>In-memory Store</td><td>Menyimpan <code>id</code>, <code>title</code>, <code>completed</code>, <code>createdAt</code></td><td>Data hilang saat restart</td></tr></tbody></table></div>
+
+            <h3>Tiga API yang akan dibuat</h3>
+            <p>Hanya tiga endpoint. Setiap endpoint melayani tepat satu user story di atas.</p>
+            <div class="table-wrap"><table><thead><tr><th>Method &amp; path</th><th>Fungsi</th><th>Sukses</th><th>Error</th></tr></thead><tbody>
+              <tr><td><code>GET /api/tasks</code></td><td>Ambil semua task</td><td><code>200</code> + array task</td><td><code>500</code></td></tr>
+              <tr><td><code>POST /api/tasks</code></td><td>Buat task baru</td><td><code>201</code> + task</td><td><code>400</code> judul kosong</td></tr>
+              <tr><td><code>PATCH /api/tasks/:id/toggle</code></td><td>Ubah status selesai</td><td><code>200</code> + task</td><td><code>404</code> task tidak ada</td></tr>
+            </tbody></table></div>
+
+            <h3>Bentuk satu data Task</h3>
+            <div class="code-block"><div class="code-block__bar"><span>Contoh response JSON</span></div><pre><code>{
+  "id": "7fbbf8c6-3901-4f2f-a118-a40c681f302f",
+  "title": "Learn Kiro Specs",
+  "completed": false,
+  "createdAt": "2026-09-08T10:00:00.000Z"
+}</code></pre></div>
+
+            <h3>Cara kerja aplikasi</h3>
+            <div class="execution-list">
+              <div class="execution-item"><span>1</span><div><h2>Load</h2><p>Halaman dibuka → <code>GET /api/tasks</code> → React menampilkan daftar atau empty state.</p></div><em>Story 1</em></div>
+              <div class="execution-item"><span>2</span><div><h2>Create</h2><p>Pengguna mengisi judul → <code>POST /api/tasks</code> → server memvalidasi → task baru tampil.</p></div><em>Story 2</em></div>
+              <div class="execution-item"><span>3</span><div><h2>Toggle</h2><p>Pengguna memilih task → <code>PATCH /api/tasks/:id/toggle</code> → status diperbarui.</p></div><em>Story 3</em></div>
+              <div class="execution-item"><span>4</span><div><h2>Restart</h2><p>API dihentikan atau dimulai ulang → array kembali kosong. Ini perilaku yang disengaja.</p></div><em>By design</em></div>
+            </div>
+            <aside class="callout callout--info"><span class="callout__icon">i</span><div><strong>Data disimpan di laptop Anda, bukan di browser</strong><p>Task hidup di memory proses Node.js. Refresh browser tidak menghapus data, tetapi menghentikan atau me-restart server akan mengosongkan daftar task.</p></div></aside>
+            <aside class="callout callout--warning"><span class="callout__icon">!</span><div><strong>Bukan bagian workshop</strong><p>Tidak ada login, database, edit/delete, search, filter, pagination, Docker, deployment cloud, atau test framework. Peserta hanya membangun vertical slice inti.</p></div></aside>
+          </section>
+
+          <section>
+            <h2>Learning objectives</h2>
+            <div class="card-grid card-grid--3">
+              <div class="feature-card"><span>01</span><h3>Specify</h3><p>Mengubah ide menjadi acceptance criteria yang dapat diperiksa.</p></div>
+              <div class="feature-card"><span>02</span><h3>Design</h3><p>Meninjau komponen, API, data model, dan error handling.</p></div>
+              <div class="feature-card"><span>03</span><h3>Implement</h3><p>Menjalankan task terukur dan memvalidasi hasil terhadap spec.</p></div>
+            </div>
+          </section>
+
+          <aside class="callout callout--info"><span class="callout__icon">i</span><div><strong>Tentang workshop ini</strong><p>Guide ini terinspirasi pola navigasi AWS Workshops, tetapi merupakan materi komunitas dan bukan publikasi resmi AWS. Anda tidak memerlukan akun AWS untuk menjalankan lab utama.</p></div></aside>
+
+          <div class="module-check"><label><input type="checkbox" data-module-complete="welcome"><span>Saya memahami tujuan dan aplikasi yang akan dibangun.</span></label></div>
+        </article>
+
+        <article class="module" id="setup" data-module="setup" data-title="Registrasi & setup">
+          <header class="module-header"><span class="eyebrow">Modul 2 · 7 menit</span><h1>Registrasi dan setup Kiro</h1><p>Pasang Kiro IDE, masuk dengan identitas pilihan Anda, lalu catat saldo awal sebelum mengirim prompt.</p></header>
+
+          <aside class="callout callout--warning"><span class="callout__icon">!</span><div><strong>Verifikasi penawaran saat registrasi</strong><p>Halaman pricing resmi saat panduan ini dibuat mencantumkan Free tier sebesar 50 credits. Paket, model, bonus trial, dan rate dapat berubah. Selalu lihat <a href="https://kiro.dev/pricing/" target="_blank" rel="noopener noreferrer">Kiro Pricing</a> sebelum workshop.</p></div></aside>
+
+          <ol class="steps">
+            <li><div class="step-number">1</div><div><h2>Unduh dan instal Kiro</h2><p>Buka <a href="https://kiro.dev/downloads/" target="_blank" rel="noopener noreferrer">kiro.dev/downloads</a>, pilih installer untuk sistem operasi Anda, lalu jalankan instalasi.</p></div></li>
+            <li><div class="step-number">2</div><div><h2>Masuk ke Kiro</h2><p>Buka Kiro dan pilih metode sign-in yang tersedia, misalnya GitHub, Google, atau AWS Builder ID. Akun AWS tidak diwajibkan untuk menggunakan Kiro.</p></div></li>
+            <li><div class="step-number">3</div><div><h2>Periksa credit balance</h2><p>Buka dashboard subscription/usage dari Kiro. Catat saldo yang terlihat sebagai <strong>Starting balance</strong> pada tracker di bawah. Pembaruan usage dapat tidak langsung terlihat.</p></div></li>
+          </ol>
+
+          <div class="credit-panel" id="credit-tracker">
+            <div class="credit-panel__header"><div><span class="eyebrow">Eksperimen penggunaan</span><h2>50-credit lab tracker</h2></div><div class="credit-score"><strong id="credits-used">0.00</strong><span>/ 50 guardrail</span></div></div>
+            <p>Masukkan saldo tersisa dari dashboard Kiro setelah tiap fase. Tracker menghitung selisihnya; angka ini bukan estimator resmi Kiro.</p>
+            <div class="credit-meter" role="progressbar" aria-label="Credit yang digunakan" aria-valuemin="0" aria-valuemax="50" aria-valuenow="0"><span id="credit-meter-bar"></span></div>
+            <div class="credit-status" id="credit-status" role="status" aria-live="polite">Aman untuk memulai lab.</div>
+            <div class="credit-fields">
+              <label>Saldo awal<input type="number" id="credit-start" inputmode="decimal" min="0" step="0.01" value="50" data-credit-field="start"></label>
+              <label>Setelah requirements<input type="number" id="credit-requirements" inputmode="decimal" min="0" step="0.01" placeholder="contoh: 46.25" data-credit-field="requirements"></label>
+              <label>Setelah design<input type="number" id="credit-design" inputmode="decimal" min="0" step="0.01" placeholder="Saldo tersisa" data-credit-field="design"></label>
+              <label>Setelah tasks<input type="number" id="credit-tasks" inputmode="decimal" min="0" step="0.01" placeholder="Saldo tersisa" data-credit-field="tasks"></label>
+              <label>Setelah implementasi<input type="number" id="credit-implementation" inputmode="decimal" min="0" step="0.01" placeholder="Saldo tersisa" data-credit-field="implementation"></label>
+              <label>Setelah validasi<input type="number" id="credit-validation" inputmode="decimal" min="0" step="0.01" placeholder="Saldo tersisa" data-credit-field="validation"></label>
+            </div>
+            <div class="budget-grid">
+              <div><span>Requirements</span><strong>≤ 6</strong></div><div><span>Design</span><strong>≤ 6</strong></div><div><span>Tasks</span><strong>≤ 4</strong></div><div><span>Implementasi</span><strong>≤ 28</strong></div><div><span>Validasi/fix</span><strong>≤ 6</strong></div>
+            </div>
+            <small class="muted">Angka per fase adalah guardrail workshop, bukan tarif atau jaminan konsumsi. Kompleksitas, model, refinement, dan eksekusi task memengaruhi usage.</small>
+          </div>
+
+          <div class="module-check"><label><input type="checkbox" data-module-complete="setup"><span>Kiro sudah terpasang, saya sudah sign-in, dan saldo awal sudah dicatat.</span></label></div>
+        </article>
+
+        <article class="module" id="workspace" data-module="workspace" data-title="Siapkan workspace">
+          <header class="module-header"><span class="eyebrow">Modul 3 · 5 menit</span><h1>Siapkan workspace kosong</h1><p>Kita sengaja memulai dari folder kosong agar artefak dan kode dihasilkan dari spec yang sama.</p></header>
+
+          <ol class="steps">
+            <li><div class="step-number">1</div><div><h2>Instal Node.js LTS dan npm</h2><p>Lakukan langkah ini sebelum workshop. Untuk Windows pemula, unduh installer <strong>LTS</strong> dari <a href="https://nodejs.org/en/download" target="_blank" rel="noopener noreferrer">Node.js Downloads</a>. npm ikut terpasang bersama Node.js. Alternatif Windows dengan winget:</p>
+              <div class="code-block"><div class="code-block__bar"><span>PowerShell / Windows Terminal</span><button class="copy-button" type="button" data-copy-target="cmd-node-install">Copy</button></div><pre id="cmd-node-install"><code>winget install OpenJS.NodeJS.LTS</code></pre></div>
+              <p class="muted">macOS/Linux/WSL: gunakan installer atau version manager LTS yang direkomendasikan pada halaman Node.js Downloads. Setelah instalasi, tutup dan buka kembali Kiro.</p>
+            </div></li>
+            <li><div class="step-number">2</div><div><h2>Verifikasi Node.js dan npm</h2><p>Buka terminal baru di Kiro dan jalankan:</p>
+              <div class="code-block"><div class="code-block__bar"><span>Terminal</span><button class="copy-button" type="button" data-copy-target="cmd-versions">Copy</button></div><pre id="cmd-versions"><code>node --version
+npm --version</code></pre></div>
+              <p>Kedua command harus menampilkan nomor versi. Jika muncul <code>not recognized</code> atau <code>command not found</code>, restart Kiro dan pastikan Node.js tersedia pada <code>PATH</code>.</p>
+            </div></li>
+            <li><div class="step-number">3</div><div><h2>Buat folder project</h2><p>Buat folder bernama <code>kiro-task-tracker</code>, lalu buka folder tersebut melalui <strong>File → Open Folder</strong> di Kiro.</p>
+              <div class="code-block"><div class="code-block__bar"><span>Struktur awal</span></div><pre><code>kiro-task-tracker/
+└── (empty)</code></pre></div>
+            </div></li>
+            <li><div class="step-number">4</div><div><h2>Pastikan mode Spec tersedia</h2><p>Pada chat Kiro pilih sesi <strong>Spec</strong>. Untuk lab ini gunakan alur <strong>Feature → Requirements-First</strong>, bukan Quick Spec, agar setiap keputusan dapat ditinjau.</p></div></li>
+          </ol>
+
+          <aside class="callout callout--tip"><span class="callout__icon">✓</span><div><strong>Credit-saving rule</strong><p>Jangan mengirim prompt eksplorasi yang berulang. Gunakan prompt yang sudah disiapkan, review hasil secara manual, dan lakukan refinement hanya jika acceptance criteria penting belum ada.</p></div></aside>
+          <div class="module-check"><label><input type="checkbox" data-module-complete="workspace"><span>Folder kosong sudah dibuka dan Node.js tersedia.</span></label></div>
+        </article>
+
+        <article class="module" id="requirements" data-module="requirements" data-title="Requirements">
+          <header class="module-header"><span class="eyebrow">Modul 4 · 10 menit</span><h1>Definisikan requirements</h1><p>Mulai Feature Spec Requirements-First. Kita menetapkan perilaku aplikasi dan batas scope sebelum Kiro menulis kode.</p></header>
+
+          <ol class="steps">
+            <li><div class="step-number">1</div><div><h2>Buat Feature Spec</h2><p>Pada panel <strong>Specs</strong>, klik <strong>+</strong>, pilih <strong>Feature</strong> lalu <strong>Requirements-First</strong>. Gunakan nama <code>task-tracker</code>.</p></div></li>
+            <li><div class="step-number">2</div><div><h2>Kirim prompt requirement</h2><p>Salin prompt berikut tanpa menambah fitur lain.</p>
+              <div class="code-block code-block--prompt"><div class="code-block__bar"><span>Prompt 1 · Create requirements</span><button class="copy-button" type="button" data-copy-target="prompt-requirements">Copy prompt</button></div><pre id="prompt-requirements"><code>Buat feature spec Requirements-First untuk aplikasi Task Tracker full-stack.
+
+Tujuan pengguna:
+1. Melihat daftar task.
+2. Menambahkan task dengan judul wajib.
+3. Menandai task selesai atau belum selesai.
+
+Gunakan React dengan Vite untuk frontend, Node.js dengan Express untuk backend, dan penyimpanan in-memory. Aplikasi hanya satu halaman.
+
+API dibatasi menjadi:
+- GET /api/tasks
+- POST /api/tasks
+- PATCH /api/tasks/:id/toggle
+
+Acceptance criteria harus mencakup happy path, judul kosong, task yang tidak ditemukan, kegagalan API, loading state, dan empty state. Gunakan format EARS yang jelas.
+
+Jangan tambahkan autentikasi, database cloud, deployment, Docker, state-management library, pagination, search, real-time update, atau styling kompleks.</code></pre></div>
+            </div></li>
+            <li><div class="step-number">3</div><div><h2>Review sebelum approve</h2><p>Buka <code>.kiro/specs/task-tracker/requirements.md</code>. Pastikan requirement menjelaskan perilaku yang teramati, bukan detail kode.</p>
+              <ul class="check-list"><li>Menampilkan daftar dan empty state.</li><li>Menambah judul valid.</li><li>Menolak judul kosong.</li><li>Toggle status selesai.</li><li>Menangani not found dan API error.</li></ul>
+            </div></li>
+          </ol>
+
+          <aside class="callout callout--example"><span class="callout__icon">Aa</span><div><strong>Contoh EARS</strong><p><code>WHEN</code> pengguna mengirim judul kosong, <code>THE SYSTEM SHALL</code> menolak permintaan dan menampilkan pesan validasi.</p></div></aside>
+          <aside class="callout callout--warning"><span class="callout__icon">!</span><div><strong>Stop condition</strong><p>Jika hasil menambahkan auth, cloud database, atau lebih dari tiga endpoint, refine satu kali dengan: “Hapus semua fitur di luar batas scope yang diberikan.” Jangan membuat spec baru.</p></div></aside>
+          <div class="checkpoint"><span>Checkpoint</span><strong><code>requirements.md</code> tersedia dan sudah disetujui.</strong></div>
+          <div class="module-check"><label><input type="checkbox" data-module-complete="requirements"><span>Requirements sudah direview dan approved.</span></label></div>
+        </article>
+
+        <article class="module" id="design" data-module="design" data-title="Design">
+          <header class="module-header"><span class="eyebrow">Modul 5 · 7 menit</span><h1>Review technical design</h1><p>Generate design dari requirements yang telah disetujui. Jangan memilih teknologi baru saat fase ini.</p></header>
+
+          <ol class="steps">
+            <li><div class="step-number">1</div><div><h2>Generate design</h2><p>Lanjutkan workflow Spec dan minta Kiro membuat <code>design.md</code>. Jika diminta konteks tambahan, gunakan prompt pembatas berikut.</p>
+              <div class="code-block code-block--prompt"><div class="code-block__bar"><span>Prompt 2 · Design guardrail</span><button class="copy-button" type="button" data-copy-target="prompt-design">Copy prompt</button></div><pre id="prompt-design"><code>Buat design sesederhana mungkin untuk workshop pemula.
+
+Gunakan monorepo dengan folder client dan server, React hooks bawaan, native fetch, Express, dan array in-memory. Sertakan data flow, kontrak tiga endpoint, model Task, validasi, dan error handling.
+
+Hindari repository pattern, ORM, Docker, authentication, cloud services, dan abstraksi yang tidak diperlukan.</code></pre></div>
+            </div></li>
+            <li><div class="step-number">2</div><div><h2>Cocokkan design dengan target</h2>
+              <div class="diagram"><div><strong>TaskPage</strong><small>state & fetch</small></div><span>→</span><div><strong>TaskForm</strong><small>create task</small></div><span>+</span><div><strong>TaskList</strong><small>render & toggle</small></div></div>
+              <div class="table-wrap"><table><thead><tr><th>Method</th><th>Path</th><th>Success</th><th>Error utama</th></tr></thead><tbody><tr><td><code>GET</code></td><td><code>/api/tasks</code></td><td>200 + array</td><td>500</td></tr><tr><td><code>POST</code></td><td><code>/api/tasks</code></td><td>201 + task</td><td>400 title kosong</td></tr><tr><td><code>PATCH</code></td><td><code>/api/tasks/:id/toggle</code></td><td>200 + task</td><td>404 not found</td></tr></tbody></table></div>
+            </div></li>
+            <li><div class="step-number">3</div><div><h2>Approve design</h2><p>Approve bila design hanya memiliki komponen dan endpoint yang dibutuhkan. Catat saldo tersisa pada tracker setelah fase ini.</p></div></li>
+          </ol>
+
+          <div class="checkpoint"><span>Checkpoint</span><strong><code>design.md</code> memetakan UI → API → storage dan sudah disetujui.</strong></div>
+          <div class="module-check"><label><input type="checkbox" data-module-complete="design"><span>Design sudah direview dan approved.</span></label></div>
+        </article>
+
+        <article class="module" id="tasks" data-module="tasks" data-title="Implementation tasks">
+          <header class="module-header"><span class="eyebrow">Modul 6 · 5 menit</span><h1>Buat implementation plan</h1><p>Ubah design menjadi task kecil yang memiliki hasil jelas dan dapat dijalankan berurutan.</p></header>
+
+          <ol class="steps">
+            <li><div class="step-number">1</div><div><h2>Generate tasks</h2><p>Lanjutkan workflow untuk membuat <code>tasks.md</code>. Gunakan pembatas ini jika task terlalu banyak.</p>
+              <div class="code-block code-block--prompt"><div class="code-block__bar"><span>Prompt 3 · Task plan guardrail</span><button class="copy-button" type="button" data-copy-target="prompt-tasks">Copy prompt</button></div><pre id="prompt-tasks"><code>Buat tepat lima required implementation tasks:
+1. Scaffold project dan shared scripts.
+2. Implementasikan in-memory store dan tiga endpoint Express.
+3. Implementasikan React UI dan state.
+4. Integrasikan UI dengan API termasuk loading, empty, validation, dan error state.
+5. Jalankan validasi build dan smoke test.
+
+Setiap task harus merujuk requirement terkait. Jangan menambahkan optional tasks, deployment, authentication, database, atau test framework baru.</code></pre></div>
+            </div></li>
+            <li><div class="step-number">2</div><div><h2>Review dependencies</h2><p>Pastikan scaffolding dikerjakan sebelum backend/frontend, dan validasi menjadi task terakhir. Untuk lab ini jalankan task satu per satu agar konsumsi dan perubahan mudah diamati.</p></div></li>
+          </ol>
+
+          <h2>Mengapa ada dua pilihan Run All Tasks?</h2>
+          <p>Pada versi Kiro IDE yang diuji untuk workshop ini, required dan optional task dibedakan pada <code>tasks.md</code> dengan format berikut. Konvensi marker, label, dan kapan chooser tampil dapat berubah pada versi Kiro berikutnya.</p>
+          <div class="code-block"><div class="code-block__bar"><span>Task markers</span></div><pre><code>- [ ] 1. Implementasikan fitur inti
+- [ ]* 1.1 Tambahkan property-based tests</code></pre></div>
+          <div class="table-wrap"><table><thead><tr><th>Pilihan</th><th>Yang dijalankan</th><th>Rekomendasi</th></tr></thead><tbody><tr><td><strong>Run all required tasks</strong></td><td>Seluruh required task yang belum selesai (<code>- [ ]</code>)</td><td>Gunakan untuk implementasi inti atau dry run fasilitator</td></tr><tr><td><strong>Run all required and optional tasks</strong></td><td>Required dan optional task yang belum selesai (<code>- [ ]*</code>)</td><td>Hanya stretch goal jika waktu dan credit cukup</td></tr></tbody></table></div>
+          <p>Kiro membuat dependency graph dan menjalankan task terpilih dalam beberapa wave. Task independen dapat berjalan paralel; task dependent menunggu prerequisite selesai.</p>
+          <aside class="callout callout--tip"><span class="callout__icon">✓</span><div><strong>Pilihan workshop ini</strong><p>Spec kita memiliki tepat lima required task dan tidak memiliki optional task. Jalankan satu per satu untuk review diff dan credit checkpoint. Jika perlu bulk run, pilih <strong>Run all required tasks</strong>. Jika kedua opsi tetap tampil tanpa optional task, pilih required-only agar intent tetap jelas.</p></div></aside>
+          <aside class="callout callout--warning"><span class="callout__icon">!</span><div><strong>Optional tidak boleh memblokir required</strong><p>Optional task harus benar-benar non-blocking. Jika required task bergantung pada optional task, perbaiki <code>tasks.md</code> sebelum eksekusi.</p></div></aside>
+          <div class="checkpoint"><span>Checkpoint</span><strong><code>tasks.md</code> berisi tepat lima required tasks dan tidak memiliki optional task.</strong></div>
+          <div class="module-check"><label><input type="checkbox" data-module-complete="tasks"><span>Tasks sudah direview dan siap dijalankan.</span></label></div>
+        </article>
+
+        <article class="module" id="implementation" data-module="implementation" data-title="Build aplikasi">
+          <header class="module-header"><span class="eyebrow">Modul 7 · 15 menit</span><h1>Implementasikan vertical slice</h1><p>Jalankan task secara berurutan. Setelah setiap task, lihat diff dan pastikan tidak ada scope tambahan.</p></header>
+
+          <aside class="callout callout--danger"><span class="callout__icon">!</span><div><strong>Credit checkpoint sebelum implementasi</strong><p>Periksa saldo. Jika total usage sudah mencapai 20 credits, prioritaskan task backend, UI, dan integration; lewati polish. Jika mencapai 40, hentikan refinement dan gunakan hanya satu prompt perbaikan terarah.</p></div></aside>
+
+          <div class="execution-list">
+            <div class="execution-item"><span>1</span><div><h2>Scaffold</h2><p>Jalankan task scaffolding. Hasil minimum: root scripts, <code>client/</code>, <code>server/</code>, dan dependency yang diperlukan.</p></div><em>Target ≤ 4 credits</em></div>
+            <div class="execution-item"><span>2</span><div><h2>Backend</h2><p>Jalankan task API. Review bahwa hanya tiga endpoint dibuat dan validasi title dilakukan di server.</p></div><em>Target ≤ 7 credits</em></div>
+            <div class="execution-item"><span>3</span><div><h2>Frontend</h2><p>Jalankan task UI. Review form, list, empty state, loading, dan pesan error.</p></div><em>Target ≤ 9 credits</em></div>
+            <div class="execution-item"><span>4</span><div><h2>Integration</h2><p>Jalankan task integrasi. Pastikan frontend menggunakan native <code>fetch</code> dan memperbarui state setelah create/toggle.</p></div><em>Target ≤ 8 credits</em></div>
+          </div>
+
+          <h2>Jika implementasi berhenti atau terlalu luas</h2>
+          <p>Gunakan satu prompt koreksi yang menyebut gejala dan hasil yang diharapkan. Jangan meminta Kiro “perbaiki semuanya”.</p>
+          <div class="code-block code-block--prompt"><div class="code-block__bar"><span>Prompt 4 · Focused recovery</span><button class="copy-button" type="button" data-copy-target="prompt-recovery">Copy prompt</button></div><pre id="prompt-recovery"><code>Periksa implementasi saat ini terhadap requirements dan design task-tracker.
+
+Perbaiki hanya masalah yang menghalangi vertical slice berikut:
+- server dapat dijalankan,
+- client dapat dijalankan,
+- daftar task dapat dimuat,
+- task valid dapat ditambahkan,
+- status task dapat di-toggle.
+
+Jangan refactor, menambah dependency, mengubah styling, atau menambahkan fitur baru. Jelaskan file yang diubah setelah selesai.</code></pre></div>
+
+          <h2>Jalankan aplikasi</h2>
+          <p>Pastikan terminal berada di root project yang berisi <code>package.json</code>, <code>client/</code>, dan <code>server/</code>. Pasang seluruh workspace dependency, lalu jalankan Client dan API:</p>
+          <div class="code-block"><div class="code-block__bar"><span>Terminal · project root</span><button class="copy-button" type="button" data-copy-target="cmd-run">Copy</button></div><pre id="cmd-run"><code>npm install
+npm run dev</code></pre></div>
+          <div class="table-wrap"><table><thead><tr><th>Komponen</th><th>URL</th><th>Fungsi</th></tr></thead><tbody><tr><td>React Client</td><td><code>http://localhost:5173</code></td><td>UI Task Tracker</td></tr><tr><td>Express API</td><td><code>http://localhost:3001/api/tasks</code></td><td>JSON task endpoint</td></tr></tbody></table></div>
+          <p>Buka <code>http://localhost:5173</code> di browser. Biarkan terminal tetap terbuka selama smoke test. Untuk menghentikan Client dan API, fokuskan terminal lalu tekan <code>Ctrl + C</code>.</p>
+          <aside class="callout callout--info"><span class="callout__icon">i</span><div><strong>Data tidak persistent</strong><p>Task disimpan pada array in-memory. Menghentikan atau me-restart API akan menghapus seluruh task; ini adalah acceptance criterion, bukan bug.</p></div></aside>
+          <p class="muted">Development server adalah proses jangka panjang dan harus dijalankan manual pada terminal Kiro. Jangan mengubah port atau menambahkan CORS package; Vite proxy sudah diarahkan ke API port 3001.</p>
+
+          <div class="module-check"><label><input type="checkbox" data-module-complete="implementation"><span>Aplikasi dapat dijalankan dan vertical slice utama tersedia.</span></label></div>
+        </article>
+
+        <article class="module" id="validation" data-module="validation" data-title="Validasi">
+          <header class="module-header"><span class="eyebrow">Modul 8 · 5 menit</span><h1>Validasi terhadap spec</h1><p>Keberhasilan bukan sekadar “aplikasi terbuka”. Uji perilaku yang ditulis pada acceptance criteria.</p></header>
+
+          <div class="test-grid">
+            <label><input type="checkbox" data-test-check><span><strong>Load list</strong><small>Aplikasi menampilkan task atau empty state.</small></span></label>
+            <label><input type="checkbox" data-test-check><span><strong>Create valid task</strong><small>Task baru muncul setelah title valid dikirim.</small></span></label>
+            <label><input type="checkbox" data-test-check><span><strong>Reject empty title</strong><small>Pesan validasi tampil dan task tidak dibuat.</small></span></label>
+            <label><input type="checkbox" data-test-check><span><strong>Toggle status</strong><small>Status task berubah tanpa reload manual.</small></span></label>
+            <label><input type="checkbox" data-test-check><span><strong>API failure</strong><small>UI menampilkan error ketika server dihentikan.</small></span></label>
+            <label><input type="checkbox" data-test-check><span><strong>Restart resets data</strong><small>Setelah API dimulai ulang, daftar kembali kosong.</small></span></label>
+          </div>
+
+          <h2>Validasi build</h2>
+          <div class="code-block"><div class="code-block__bar"><span>Terminal</span><button class="copy-button" type="button" data-copy-target="cmd-build">Copy</button></div><pre id="cmd-build"><code>npm run build</code></pre></div>
+          <p>Jika build gagal, kirim satu error aktual kepada Kiro dan minta perbaikan terbatas:</p>
+          <div class="code-block code-block--prompt"><div class="code-block__bar"><span>Prompt 5 · Targeted build fix</span><button class="copy-button" type="button" data-copy-target="prompt-fix">Copy prompt</button></div><pre id="prompt-fix"><code>Perbaiki hanya error build berikut tanpa refactor atau fitur tambahan:
+
+[PASTE ERROR TERMINAL DI SINI]
+
+Setelah memperbaiki, jalankan kembali build satu kali dan ringkas perubahan.</code></pre></div>
+
+          <aside class="callout callout--tip"><span class="callout__icon">✓</span><div><strong>Definition of done</strong><p>Build berhasil, keenam smoke test dikonfirmasi peserta, dan implementasi tetap hanya memiliki satu entity, satu halaman, serta tiga endpoint. Build tanpa smoke test hanya berarti <em>implementation ready for acceptance</em>, belum spec complete.</p></div></aside>
+          <div class="module-check"><label><input type="checkbox" data-module-complete="validation"><span>Smoke test selesai dan hasil sesuai acceptance criteria.</span></label></div>
+        </article>
+
+        <article class="module" id="finish" data-module="finish" data-title="Credit review">
+          <header class="module-header"><span class="eyebrow">Modul 9 · 3 menit</span><h1>Review hasil dan penggunaan credit</h1><p>Catat saldo terakhir, evaluasi fase termahal, dan bawa insight ini ke pelaksanaan workshop.</p></header>
+
+          <div class="completion-card">
+            <div class="completion-card__icon">✓</div>
+            <div><span class="eyebrow">Lab complete</span><h2>Anda membangun aplikasi dari spec, bukan dari tebakan.</h2><p>Requirements mendefinisikan perilaku, design membuat keputusan teknis terlihat, dan tasks menghubungkan design ke implementasi.</p></div>
+          </div>
+
+          <h2>Catat hasil eksperimen</h2>
+          <div class="result-grid">
+            <div><label for="result-time">Total waktu</label><strong><input id="result-time" type="number" min="0" placeholder="60"> menit</strong></div>
+            <div><label for="result-balance">Saldo akhir</label><strong><input id="result-balance" type="number" min="0" step="0.01" placeholder="0.00"> credits</strong></div>
+            <div><label for="result-prompts">Prompt/refinement</label><strong><input id="result-prompts" type="number" min="0" placeholder="0"> kali</strong></div>
+            <div><label for="result-tasks">Task executed</label><strong><input id="result-tasks" type="number" min="0" placeholder="0"> task</strong></div>
+          </div>
+
+          <h2>Pertanyaan evaluasi fasilitator</h2>
+          <ol class="review-questions"><li>Apakah total penggunaan maksimal 50 credits?</li><li>Fase mana yang menggunakan credits paling besar?</li><li>Apakah ada prompt yang sebenarnya bisa dihilangkan?</li><li>Apakah semua peserta dapat mencapai vertical slice dalam 60 menit?</li><li>Checkpoint mana yang perlu disediakan sebagai backup?</li></ol>
+
+          <h2>Next step ke AWS</h2>
+          <div class="architecture architecture--cloud"><div class="architecture__node"><span class="node-icon">UI</span><strong>Amplify Hosting</strong><small>atau S3 + CloudFront</small></div><div class="architecture__connector"><i>→</i></div><div class="architecture__node"><span class="node-icon">API</span><strong>API Gateway</strong><small>+ AWS Lambda</small></div><div class="architecture__connector"><i>→</i></div><div class="architecture__node"><span class="node-icon">DB</span><strong>DynamoDB</strong><small>persistent tasks</small></div></div>
+          <p>Ekstensi cloud sengaja tidak dilakukan dalam lab 60 menit. Requirement inti dapat dipertahankan; perbarui <code>design.md</code> dan <code>tasks.md</code> untuk migrasi implementasi.</p>
+
+          <div class="resources"><h2>Referensi resmi</h2><ul><li><a href="https://kiro.dev/pricing/" target="_blank" rel="noopener noreferrer">Kiro Pricing</a></li><li><a href="https://kiro.dev/docs/specs/" target="_blank" rel="noopener noreferrer">Kiro Specs & parallel execution</a></li><li><a href="https://kiro.dev/docs/specs/feature-specs/requirements-first/" target="_blank" rel="noopener noreferrer">Requirements-First workflow</a></li><li><a href="https://kiro.dev/docs/specs/best-practices/" target="_blank" rel="noopener noreferrer">Run all Tasks & best practices</a></li><li><a href="https://kiro.dev/docs/specs/correctness/" target="_blank" rel="noopener noreferrer">Optional correctness tasks</a></li><li><a href="https://kiro.dev/docs/billing/" target="_blank" rel="noopener noreferrer">Kiro Billing</a></li><li><a href="https://nodejs.org/en/download" target="_blank" rel="noopener noreferrer">Node.js Downloads</a></li></ul><small>Informasi produk dari sumber resmi telah diparafrasekan untuk mematuhi ketentuan lisensi. Wording UI dan behavior produk dapat berubah; periksa sumber untuk informasi terbaru.</small></div>
+          <div class="module-check"><label><input type="checkbox" data-module-complete="finish"><span>Saldo akhir dan hasil eksperimen sudah dicatat.</span></label></div>
+        </article>
+
+        <nav class="module-pager" aria-label="Navigasi antar modul">
+          <button class="button button--secondary" id="prev-module" type="button"><span aria-hidden="true">←</span> Sebelumnya</button>
+          <button class="button button--primary" id="next-module" type="button">Berikutnya <span aria-hidden="true">→</span></button>
+        </nav>
+
+        <footer class="site-footer"><p>Built for Kiro Spec-Driven Development Workshop · September 2026</p><p>Community guide — not an official AWS publication.</p></footer>
+      </div>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
