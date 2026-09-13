@@ -304,17 +304,85 @@ Selalu verifikasi estimasi di [AWS Pricing Calculator](https://calculator.aws/).
 
 ## Hapus semua resource
 
+Script destroy-nya adalah `deploy/teardown.sh`.
+
+Lihat dulu apa yang akan dihapus tanpa mengubah apa pun:
+
+```bash
+DRY_RUN=true ./deploy/teardown.sh
+```
+
+Lalu jalankan sebenarnya:
+
 ```bash
 ./deploy/teardown.sh
 ```
 
-Script meminta Anda mengetik nama stack sebagai konfirmasi, lalu menghapus stack beserta VPC, ALB, ECS cluster, dan log group. ECR repository sengaja dipertahankan. Untuk menghapusnya juga:
+Script akan menampilkan account, region, status stack, dan daftar resource yang akan dihapus, lalu meminta Anda mengetik nama stack sebagai konfirmasi.
+
+### Yang dihapus dan yang tidak
+
+| Resource | Default | Cara menghapus |
+|---|---|---|
+| Stack: VPC, subnet, IGW, security group, ALB, listener, target group, ECS cluster, service, task definition, IAM role, log group | **Dihapus** | otomatis |
+| ECR repository dan seluruh image | Dipertahankan | `DELETE_ECR=true` |
+| Secrets Manager secret untuk GHCR privat | Dipertahankan | `DELETE_SECRET_ARN=<arn>` |
+| Package image di GHCR | Dipertahankan | manual, AWS CLI tidak bisa menyentuhnya |
+| ACM certificate, Route 53 record, pull-through cache rule | Dipertahankan | manual, tidak dibuat stack ini |
+
+Menghapus semuanya sekaligus:
 
 ```bash
-DELETE_ECR=true ./deploy/teardown.sh
+DELETE_ECR=true \
+DELETE_SECRET_ARN=arn:aws:secretsmanager:ap-southeast-1:111122223333:secret:ghcr-pull-credentials-AbCdEf \
+./deploy/teardown.sh
 ```
 
-> `DELETE_ECR=true` memakai `--force` dan menghapus seluruh image dalam repository. Tindakan ini tidak dapat dibatalkan.
+### Opsi
+
+| Variable | Default | Keterangan |
+|---|---|---|
+| `DRY_RUN` | `false` | Hanya menampilkan rencana, tidak mengubah apa pun |
+| `FORCE` | `false` | Melewati prompt konfirmasi, untuk CI |
+| `DELETE_ECR` | `false` | Hapus ECR repository beserta semua image |
+| `DELETE_SECRET_ARN` | kosong | ARN secret yang akan dihapus |
+| `PURGE_SECRET` | `false` | Hapus secret langsung tanpa masa pemulihan |
+| `PROJECT_NAME` | `kiro-builder-lab` | Nama project dan nama ECR repository |
+| `STACK_NAME` | sama dengan `PROJECT_NAME` | Stack yang dihapus |
+| `AWS_REGION` | region CLI, fallback `ap-southeast-1` | Region tujuan |
+
+Catatan:
+
+- `DELETE_ECR=true` memakai `--force` sehingga seluruh image terhapus dan **tidak dapat dibatalkan**.
+- Secret secara default dijadwalkan hapus dengan masa pemulihan 7 hari, jadi masih bisa dibatalkan dengan `aws secretsmanager restore-secret`. `PURGE_SECRET=true` menghapusnya permanen.
+- Bila `FORCE` tidak diaktifkan dan tidak ada terminal interaktif, script berhenti daripada menghapus tanpa konfirmasi.
+- Urutan penghapusan adalah stack, lalu ECR, lalu secret, dan script berhenti pada kegagalan pertama. Jadi bila penghapusan ECR gagal, secret belum tersentuh. Jalankan ulang setelah penyebabnya diatasi.
+
+### Menghapus package GHCR
+
+AWS CLI tidak bisa menghapus package di GitHub. Lakukan lewat halaman **Package settings → Delete package**, atau dengan gh CLI:
+
+```bash
+gh api --method DELETE /user/packages/container/<PACKAGE_NAME>
+```
+
+Untuk package milik organisasi gunakan `/orgs/<ORG>/packages/container/<PACKAGE_NAME>`. Token perlu scope `delete:packages`. Verifikasi nama package di halaman Packages sebelum menjalankannya.
+
+### Jika stack gagal dihapus
+
+Script mencetak event `DELETE_FAILED` terakhir beserta alasannya. Penyebab yang paling sering:
+
+- Ada resource yang diubah manual di luar CloudFormation. Kembalikan perubahannya, lalu jalankan ulang.
+- ENI masih menempel saat ECS baru berhenti. Tunggu beberapa menit, jalankan ulang.
+
+Bila satu resource tetap menolak dihapus, lewati resource itu lalu bersihkan manual:
+
+```bash
+aws cloudformation delete-stack \
+  --stack-name kiro-builder-lab \
+  --region ap-southeast-1 \
+  --retain-resources <LogicalId>
+```
 
 ## Catatan keamanan
 
@@ -338,8 +406,8 @@ deploy/
 ├── nginx.conf              # port 8080, /healthz, /favicon.ico 204, gzip, SPA fallback
 ├── security-headers.conf   # header keamanan, di-include tiap location
 ├── infrastructure.yaml     # CloudFormation: VPC, ALB, ECS, IAM, Logs
-├── deploy.sh               # build, push ke ECR, deploy stack
-├── teardown.sh             # hapus stack, opsional hapus ECR
+├── deploy.sh               # build, push ke ECR atau pakai image GHCR, deploy stack
+├── teardown.sh             # destroy stack, opsional ECR dan secret, dengan dry-run
 └── README.md               # dokumen ini
 ```
 

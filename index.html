@@ -187,29 +187,21 @@
           <ol class="steps">
             <li><div class="step-number">1</div><div><h2>Unduh dan instal Kiro</h2><p>Buka <a href="https://kiro.dev/downloads/" target="_blank" rel="noopener noreferrer">kiro.dev/downloads</a>, pilih installer untuk sistem operasi Anda, lalu jalankan instalasi.</p></div></li>
             <li><div class="step-number">2</div><div><h2>Masuk ke Kiro</h2><p>Buka Kiro dan pilih metode sign-in yang tersedia, misalnya GitHub, Google, atau AWS Builder ID. Akun AWS tidak diwajibkan untuk menggunakan Kiro.</p></div></li>
-            <li><div class="step-number">3</div><div><h2>Periksa credit balance</h2><p>Buka dashboard subscription/usage dari Kiro. Catat saldo yang terlihat sebagai <strong>Starting balance</strong> pada tracker di bawah. Pembaruan usage dapat tidak langsung terlihat.</p></div></li>
+            <li><div class="step-number">3</div><div><h2>Periksa credit balance</h2><p>Buka dashboard subscription/usage dari Kiro dan lihat saldo awal Anda. Pembaruan usage dapat tidak langsung terlihat, jadi periksa lagi di antara fase bila perlu.</p></div></li>
           </ol>
 
-          <div class="credit-panel" id="credit-tracker">
-            <div class="credit-panel__header"><div><span class="eyebrow">Eksperimen penggunaan</span><h2>50-credit lab tracker</h2></div><div class="credit-score"><strong id="credits-used">0.00</strong><span>/ 50 guardrail</span></div></div>
-            <p>Masukkan saldo tersisa dari dashboard Kiro setelah tiap fase. Tracker menghitung selisihnya; angka ini bukan estimator resmi Kiro.</p>
-            <div class="credit-meter" role="progressbar" aria-label="Credit yang digunakan" aria-valuemin="0" aria-valuemax="50" aria-valuenow="0"><span id="credit-meter-bar"></span></div>
-            <div class="credit-status" id="credit-status" role="status" aria-live="polite">Aman untuk memulai lab.</div>
-            <div class="credit-fields">
-              <label>Saldo awal<input type="number" id="credit-start" inputmode="decimal" min="0" step="0.01" value="50" data-credit-field="start"></label>
-              <label>Setelah requirements<input type="number" id="credit-requirements" inputmode="decimal" min="0" step="0.01" placeholder="contoh: 46.25" data-credit-field="requirements"></label>
-              <label>Setelah design<input type="number" id="credit-design" inputmode="decimal" min="0" step="0.01" placeholder="Saldo tersisa" data-credit-field="design"></label>
-              <label>Setelah tasks<input type="number" id="credit-tasks" inputmode="decimal" min="0" step="0.01" placeholder="Saldo tersisa" data-credit-field="tasks"></label>
-              <label>Setelah implementasi<input type="number" id="credit-implementation" inputmode="decimal" min="0" step="0.01" placeholder="Saldo tersisa" data-credit-field="implementation"></label>
-              <label>Setelah validasi<input type="number" id="credit-validation" inputmode="decimal" min="0" step="0.01" placeholder="Saldo tersisa" data-credit-field="validation"></label>
-            </div>
+          <div class="credit-panel">
+            <div class="credit-panel__header"><div><span class="eyebrow">Rekomendasi penggunaan</span><h2>Budget credit per fase</h2></div></div>
+            <p>Pakai angka ini sebagai patokan saat lab berjalan. Total rekomendasinya 50 credit, sesuai Free tier.</p>
             <div class="budget-grid">
               <div><span>Requirements</span><strong>≤ 6</strong></div><div><span>Design</span><strong>≤ 6</strong></div><div><span>Tasks</span><strong>≤ 4</strong></div><div><span>Implementasi</span><strong>≤ 28</strong></div><div><span>Validasi/fix</span><strong>≤ 6</strong></div>
             </div>
-            <small class="muted">Angka per fase adalah guardrail workshop, bukan tarif atau jaminan konsumsi. Kompleksitas, model, refinement, dan eksekusi task memengaruhi usage.</small>
+            <small class="muted">Angka per fase adalah rekomendasi workshop, bukan tarif resmi atau jaminan konsumsi. Kompleksitas prompt, model, refinement, dan eksekusi task memengaruhi pemakaian aktual. Saldo sebenarnya selalu dilihat di dashboard usage Kiro.</small>
           </div>
 
-          <div class="module-check"><label><input type="checkbox" data-module-complete="setup"><span>Kiro sudah terpasang, saya sudah sign-in, dan saldo awal sudah dicatat.</span></label></div>
+          <aside class="callout callout--tip"><span class="callout__icon">✓</span><div><strong>Kalau credit tinggal sedikit</strong><p>Berhenti melakukan refinement, lalu selesaikan implementasi dengan <strong>Run all required tasks</strong> sekali jalan. Cara ini menghilangkan prompt tambahan di antara task, sehingga sisa credit dipakai untuk menyelesaikan aplikasi, bukan untuk memperbaiki spec. Eksekusi massal tetap memakai credit dan Anda kehilangan checkpoint per task, jadi pakai ini saat saldo mendesak, bukan sebagai cara default.</p></div></aside>
+
+          <div class="module-check"><label><input type="checkbox" data-module-complete="setup"><span>Kiro sudah terpasang, saya sudah sign-in, dan saldo awal sudah saya lihat di dashboard.</span></label></div>
         </article>
 
         <article class="module" id="workspace" data-module="workspace" data-title="Siapkan workspace">
@@ -299,7 +291,7 @@ Hindari repository pattern, ORM, Docker, authentication, cloud services, dan abs
               <div class="diagram"><div><strong>TaskPage</strong><small>state & fetch</small></div><span>→</span><div><strong>TaskForm</strong><small>create task</small></div><span>+</span><div><strong>TaskList</strong><small>render & toggle</small></div></div>
               <div class="table-wrap"><table><thead><tr><th>Method</th><th>Path</th><th>Success</th><th>Error utama</th></tr></thead><tbody><tr><td><code>GET</code></td><td><code>/api/tasks</code></td><td>200 + array</td><td>500</td></tr><tr><td><code>POST</code></td><td><code>/api/tasks</code></td><td>201 + task</td><td>400 title kosong</td></tr><tr><td><code>PATCH</code></td><td><code>/api/tasks/:id/toggle</code></td><td>200 + task</td><td>404 not found</td></tr></tbody></table></div>
             </div></li>
-            <li><div class="step-number">3</div><div><h2>Approve design</h2><p>Approve bila design hanya memiliki komponen dan endpoint yang dibutuhkan. Catat saldo tersisa pada tracker setelah fase ini.</p></div></li>
+            <li><div class="step-number">3</div><div><h2>Approve design</h2><p>Approve bila design hanya memiliki komponen dan endpoint yang dibutuhkan. Periksa sisa credit di dashboard Kiro sebelum lanjut ke fase tasks.</p></div></li>
           </ol>
 
           <div class="checkpoint"><span>Checkpoint</span><strong><code>design.md</code> memetakan UI → API → storage dan sudah disetujui.</strong></div>
@@ -338,13 +330,13 @@ Setiap task harus merujuk requirement terkait. Jangan menambahkan optional tasks
         <article class="module" id="implementation" data-module="implementation" data-title="Build aplikasi">
           <header class="module-header"><span class="eyebrow">Modul 7 · 15 menit</span><h1>Implementasikan vertical slice</h1><p>Jalankan task secara berurutan. Setelah setiap task, lihat diff dan pastikan tidak ada scope tambahan.</p></header>
 
-          <aside class="callout callout--danger"><span class="callout__icon">!</span><div><strong>Credit checkpoint sebelum implementasi</strong><p>Periksa saldo. Jika total usage sudah mencapai 20 credits, prioritaskan task backend, UI, dan integration; lewati polish. Jika mencapai 40, hentikan refinement dan gunakan hanya satu prompt perbaikan terarah.</p></div></aside>
+          <aside class="callout callout--danger"><span class="callout__icon">!</span><div><strong>Periksa saldo sebelum implementasi</strong><p>Buka dashboard usage Kiro. Jika sisa credit masih longgar, jalankan task satu per satu agar setiap diff bisa direview. Jika sisa credit sudah menipis, lewati polish, hentikan refinement, dan selesaikan dengan <strong>Run all required tasks</strong>.</p></div></aside>
 
           <div class="execution-list">
-            <div class="execution-item"><span>1</span><div><h2>Scaffold</h2><p>Jalankan task scaffolding. Hasil minimum: root scripts, <code>client/</code>, <code>server/</code>, dan dependency yang diperlukan.</p></div><em>Target ≤ 4 credits</em></div>
-            <div class="execution-item"><span>2</span><div><h2>Backend</h2><p>Jalankan task API. Review bahwa hanya tiga endpoint dibuat dan validasi title dilakukan di server.</p></div><em>Target ≤ 7 credits</em></div>
-            <div class="execution-item"><span>3</span><div><h2>Frontend</h2><p>Jalankan task UI. Review form, list, empty state, loading, dan pesan error.</p></div><em>Target ≤ 9 credits</em></div>
-            <div class="execution-item"><span>4</span><div><h2>Integration</h2><p>Jalankan task integrasi. Pastikan frontend menggunakan native <code>fetch</code> dan memperbarui state setelah create/toggle.</p></div><em>Target ≤ 8 credits</em></div>
+            <div class="execution-item"><span>1</span><div><h2>Scaffold</h2><p>Jalankan task scaffolding. Hasil minimum: root scripts, <code>client/</code>, <code>server/</code>, dan dependency yang diperlukan.</p></div><em>Rekomendasi ≤ 4 credits</em></div>
+            <div class="execution-item"><span>2</span><div><h2>Backend</h2><p>Jalankan task API. Review bahwa hanya tiga endpoint dibuat dan validasi title dilakukan di server.</p></div><em>Rekomendasi ≤ 7 credits</em></div>
+            <div class="execution-item"><span>3</span><div><h2>Frontend</h2><p>Jalankan task UI. Review form, list, empty state, loading, dan pesan error.</p></div><em>Rekomendasi ≤ 9 credits</em></div>
+            <div class="execution-item"><span>4</span><div><h2>Integration</h2><p>Jalankan task integrasi. Pastikan frontend menggunakan native <code>fetch</code> dan memperbarui state setelah create/toggle.</p></div><em>Rekomendasi ≤ 8 credits</em></div>
           </div>
 
           <h2>Jika implementasi berhenti atau terlalu luas</h2>

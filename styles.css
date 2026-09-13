@@ -189,19 +189,9 @@ p { margin: 0 0 14px; }
 .code-block code { font-size: inherit; }
 
 .credit-panel { margin: 34px 0; padding: 25px; background: var(--surface-alt); border: 1px solid var(--line); border-radius: var(--radius-lg); }
-.credit-panel__header { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; }
 .credit-panel__header h2 { margin: 3px 0 10px; }
-.credit-score { text-align: right; }
-.credit-score strong, .credit-score span { display: block; }
-.credit-score strong { color: var(--green-500); font-size: 36px; line-height: 1; }
-.credit-score span { color: var(--ink-500); font-size: 11px; }
-.credit-meter { height: 10px; overflow: hidden; margin: 18px 0 7px; background: var(--line); border-radius: 99px; }
-.credit-meter span { display: block; width: 0; height: 100%; background: var(--green-500); border-radius: inherit; transition: width .3s ease, background .3s ease; }
-.credit-status { margin-bottom: 18px; color: var(--green-500); font-size: 12px; font-weight: 700; }
-.credit-fields { display: grid; grid-template-columns: repeat(3, 1fr); gap: 13px; }
-.credit-fields label { color: var(--ink-700); font-size: 11px; font-weight: 700; }
-.credit-fields input, .result-grid input { width: 100%; margin-top: 5px; padding: 10px 11px; color: var(--ink-900); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); }
-.credit-fields input:focus, .result-grid input:focus { outline: 2px solid rgba(38,115,221,.25); border-color: var(--blue-500); }
+.result-grid input { width: 100%; margin-top: 5px; padding: 10px 11px; color: var(--ink-900); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); }
+.result-grid input:focus { outline: 2px solid rgba(38,115,221,.25); border-color: var(--blue-500); }
 .budget-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 18px 0 12px; }
 .budget-grid div { padding: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); text-align: center; }
 .budget-grid span, .budget-grid strong { display: block; }
@@ -263,7 +253,6 @@ tr:last-child td { border-bottom: 0; }
   .content__inner { padding: 0 30px; }
   .hero { margin-left: -30px; margin-right: -30px; padding-left: 36px; padding-right: 36px; }
   .architecture { flex-wrap: wrap; }
-  .credit-fields { grid-template-columns: repeat(2, 1fr); }
   .budget-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
@@ -299,9 +288,7 @@ tr:last-child td { border-bottom: 0; }
   .architecture__connector { transform: rotate(90deg); }
   .architecture__node { width: 100%; }
   .credit-panel { padding: 18px; }
-  .credit-panel__header { display: block; }
-  .credit-score { margin: 13px 0; text-align: left; }
-  .credit-fields, .budget-grid, .test-grid, .result-grid { grid-template-columns: 1fr; }
+  .budget-grid, .test-grid, .result-grid { grid-template-columns: 1fr; }
   .diagram { display: grid; }
   .diagram > span { transform: rotate(90deg); text-align: center; }
   .execution-item { grid-template-columns: 36px 1fr; }
@@ -328,17 +315,7 @@ tr:last-child td { border-bottom: 0; }
 :focus-visible { outline: 3px solid var(--blue-500); outline-offset: 3px; }
 .feature-card > span { color: #8a5200; }
 .result-grid label { display: block; color: var(--ink-500); font-size: 11px; text-transform: uppercase; }
-.credit-panel { --credit-status-color: var(--green-500); }
-.credit-panel[data-status="attention"] { --credit-status-color: var(--blue-500); }
-.credit-panel[data-status="warning"] { --credit-status-color: #8a5200; }
-.credit-panel[data-status="danger"] { --credit-status-color: var(--red-500); }
-.credit-panel[data-status="neutral"] { --credit-status-color: var(--ink-500); }
-.credit-panel .credit-score strong,
-.credit-panel .credit-status { color: var(--credit-status-color); }
-.credit-panel .credit-meter span { background: var(--credit-status-color); }
-
 [data-theme="dark"] .feature-card > span { color: var(--orange-400); }
-[data-theme="dark"] .credit-panel[data-status="warning"] { --credit-status-color: var(--orange-400); }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
@@ -381,4 +358,5 @@ tr:last-child td { border-bottom: 0; }
   .app-preview__button { color: #000; border: 1px solid #8a5200; }
   .app-preview__hint, .app-preview figcaption { color: #333; }
   .app-preview__input, .app-preview__state, .app-preview__list li.is-done .app-preview__label { color: #444; }
+  .result-grid input { border: 1px solid #aaa; }
 }

@@ -14,14 +14,11 @@
   ];
 
   const STORAGE_KEY = 'kiro-builder-lab-v1';
-  const CREDIT_GUARDRAIL = 50;
-  const CREDIT_PHASES = ['start', 'requirements', 'design', 'tasks', 'implementation', 'validation'];
   const RESULT_FIELDS = ['time', 'balance', 'prompts', 'tasks'];
   const mobileMedia = window.matchMedia('(max-width: 820px)');
 
   const defaultState = {
     completed: [],
-    credits: { start: '50' },
     tests: [],
     results: {},
     theme: null
@@ -48,16 +45,8 @@
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
       if (!isPlainObject(saved)) return structuredCloneSafe(defaultState);
 
-      const savedCredits = isPlainObject(saved.credits) ? saved.credits : {};
       const savedResults = isPlainObject(saved.results) ? saved.results : {};
-      const credits = { ...defaultState.credits };
       const results = {};
-
-      CREDIT_PHASES.forEach((phase) => {
-        if (!Object.hasOwn(savedCredits, phase)) return;
-        const normalized = normalizeNonNegativeValue(savedCredits[phase]);
-        if (normalized !== null) credits[phase] = normalized;
-      });
 
       RESULT_FIELDS.forEach((field) => {
         if (!Object.hasOwn(savedResults, field)) return;
@@ -73,7 +62,7 @@
         : [];
       const theme = saved.theme === 'light' || saved.theme === 'dark' ? saved.theme : null;
 
-      return { completed, credits, tests, results, theme };
+      return { completed, tests, results, theme };
     } catch {
       return structuredCloneSafe(defaultState);
     }
@@ -96,7 +85,6 @@
     elements.navLinks = [...document.querySelectorAll('[data-module-link]')];
     elements.completionChecks = [...document.querySelectorAll('[data-module-complete]')];
     elements.testChecks = [...document.querySelectorAll('[data-test-check]')];
-    elements.creditFields = [...document.querySelectorAll('[data-credit-field]')];
     elements.progressBar = document.querySelector('#progress-bar');
     elements.progressLabel = document.querySelector('#progress-label');
     elements.progressDetail = document.querySelector('#progress-detail');
@@ -108,10 +96,6 @@
     elements.sidebarBackdrop = document.querySelector('#sidebar-backdrop');
     elements.themeToggle = document.querySelector('#theme-toggle');
     elements.themeIcon = document.querySelector('.theme-icon');
-    elements.creditPanel = document.querySelector('#credit-tracker');
-    elements.creditUsed = document.querySelector('#credits-used');
-    elements.creditBar = document.querySelector('#credit-meter-bar');
-    elements.creditStatus = document.querySelector('#credit-status');
     elements.toast = document.querySelector('#toast');
   }
 
@@ -183,18 +167,12 @@
       checkbox.checked = state.tests.includes(index);
     });
 
-    elements.creditFields.forEach((field) => {
-      const savedValue = state.credits[field.dataset.creditField];
-      if (savedValue !== undefined) field.value = savedValue;
-    });
-
     RESULT_FIELDS.forEach((name) => {
       const field = document.querySelector(`#result-${name}`);
       if (field && state.results[name] !== undefined) field.value = state.results[name];
     });
 
     updateProgress();
-    updateCreditTracker();
   }
 
   function updateProgress() {
@@ -209,67 +187,6 @@
     elements.navLinks.forEach((link) => {
       link.classList.toggle('is-complete', state.completed.includes(link.dataset.moduleLink));
     });
-  }
-
-  function updateCreditTracker() {
-    const start = parseCredit(state.credits.start);
-    let latest = start;
-    let latestPhase = 'start';
-    let previous = start;
-
-    if (start === null) {
-      setCreditDisplay(0, 'Masukkan saldo awal yang terlihat di dashboard Kiro.', 'neutral');
-      return;
-    }
-
-    for (const phase of CREDIT_PHASES.slice(1)) {
-      const value = parseCredit(state.credits[phase]);
-      if (value === null) continue;
-
-      if (value > start) {
-        setCreditDisplay(0, `Saldo setelah ${phase} lebih besar dari saldo awal. Periksa input atau kemungkinan reset/bonus.`, 'warning');
-        return;
-      }
-
-      if (previous !== null && value > previous) {
-        const usedBeforeError = Math.max(0, start - previous);
-        setCreditDisplay(usedBeforeError, `Urutan saldo tidak valid: saldo setelah ${phase} meningkat. Periksa kembali input antar-fase.`, 'warning');
-        return;
-      }
-
-      latest = value;
-      latestPhase = phase;
-      previous = value;
-    }
-
-    const used = Math.max(0, start - (latest ?? start));
-    const phaseLabel = latestPhase === 'start' ? 'sebelum lab' : `setelah ${latestPhase}`;
-
-    if (used >= CREDIT_GUARDRAIL) {
-      setCreditDisplay(used, `Stop: penggunaan mencapai guardrail ${CREDIT_GUARDRAIL} credits (${phaseLabel}).`, 'danger');
-    } else if (used >= 40) {
-      setCreditDisplay(used, `Warning: tersisa ${(CREDIT_GUARDRAIL - used).toFixed(2)} dari budget eksperimen. Hindari refinement tambahan.`, 'warning');
-    } else if (used >= 20) {
-      setCreditDisplay(used, `Perhatikan budget: ${(CREDIT_GUARDRAIL - used).toFixed(2)} credits tersisa dari guardrail.`, 'attention');
-    } else {
-      setCreditDisplay(used, `Aman: ${(CREDIT_GUARDRAIL - used).toFixed(2)} credits tersisa dari guardrail eksperimen.`, 'safe');
-    }
-  }
-
-  function parseCredit(value) {
-    if (value === '' || value === undefined || value === null) return null;
-    const parsed = Number(value);
-    return Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
-  }
-
-  function setCreditDisplay(used, message, status) {
-    const percentage = Math.min(100, Math.max(0, (used / CREDIT_GUARDRAIL) * 100));
-
-    elements.creditPanel.dataset.status = status;
-    elements.creditUsed.textContent = used.toFixed(2);
-    elements.creditBar.style.width = `${percentage}%`;
-    elements.creditBar.parentElement.setAttribute('aria-valuenow', used.toFixed(2));
-    elements.creditStatus.textContent = message;
   }
 
   function applyTheme(theme) {
@@ -384,7 +301,7 @@
   }
 
   function resetWorkshop() {
-    const confirmed = window.confirm('Reset seluruh progress, credit tracker, checklist, dan hasil lab?');
+    const confirmed = window.confirm('Reset seluruh progress modul, checklist validasi, dan hasil lab?');
     if (!confirmed) return;
 
     try {
@@ -429,14 +346,6 @@
           ? [...new Set([...state.tests, index])]
           : state.tests.filter((savedIndex) => savedIndex !== index);
         saveState();
-      });
-    });
-
-    elements.creditFields.forEach((field) => {
-      field.addEventListener('input', () => {
-        state.credits[field.dataset.creditField] = field.value;
-        saveState();
-        updateCreditTracker();
       });
     });
 
@@ -501,5 +410,5 @@
     initialize();
   }
 
-  window.KiroWorkshop = { MODULES, STORAGE_KEY, CREDIT_GUARDRAIL };
+  window.KiroWorkshop = { MODULES, STORAGE_KEY };
 })();

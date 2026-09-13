@@ -113,7 +113,7 @@ workshop-kiro/
 
 - `index.html` — seluruh modul workshop dan prompt peserta.
 - `styles.css` — visual AWS Workshops-inspired, responsive, dark mode, dan print style.
-- `app.js` — navigasi, progress, clipboard, theme, dan credit tracker.
+- `app.js` — navigasi modul, progress, clipboard, theme, dan checklist validasi.
 - `.kiro/specs/task-tracker/` — spec scope-locked untuk aplikasi yang dibangun peserta.
 - `deploy/` — Dockerfile, nginx config, CloudFormation, dan script untuk deploy ke ECS Fargate.
 - `.github/workflows/publish-image.yml` — build image dan push ke GitHub Container Registry.
@@ -309,8 +309,8 @@ Eksekusi satu per satu direkomendasikan karena peserta dapat:
 
 1. Meninjau diff setelah setiap task.
 2. Mendeteksi scope creep lebih awal.
-3. Mencatat credit balance per fase.
-4. Berhenti sebelum guardrail 40/50 credits.
+3. Memeriksa credit balance di dashboard Kiro per fase.
+4. Berhenti atau beralih ke eksekusi massal sebelum credit habis.
 5. Menjalankan smoke test sebelum spec dinyatakan selesai.
 
 Optional task tidak boleh menjadi dependency bagi required task. Jika itu terjadi, perbaiki `tasks.md` lebih dahulu.
@@ -447,20 +447,33 @@ Image dapat berasal dari dua tempat:
   IMAGE_URI=ghcr.io/owner/workshop-kiro:sha-abc123 ./deploy/deploy.sh
   ```
 
+  Contoh nyata untuk repo ini:
+
+  ```bash
+  IMAGE_URI=ghcr.io/denihardiansyah/kiro-full-stack-app-with-specs:sha-<commit> ./deploy/deploy.sh
+  ```
+
+  Hindari `:latest` di sini. ECS hanya membuat deployment baru ketika task definition berubah, jadi dengan tag yang sama konten lama akan tetap tersaji meski image di GHCR sudah diperbarui.
+
 Petunjuk lengkap, opsi konfigurasi, alur GHCR untuk package public maupun private, cara mengaktifkan HTTPS, troubleshooting, perbandingan biaya, dan cara menghapus resource ada di [`deploy/README.md`](deploy/README.md).
 
 Untuk situs statis seperti ini, S3 + CloudFront lebih murah karena Fargate dan ALB berbiaya tetap meski tidak ada pengunjung. Gunakan Fargate bila Anda memang ingin pola container/ECS.
 
 ## Guardrail credit
 
-Angka 50 mengikuti Kiro Free tier yang tercantum pada halaman pricing saat materi dibuat. Konsumsi aktual tidak dapat dipastikan sebelum eksekusi karena dipengaruhi kompleksitas, model, refinement, dan task. Guide meminta peserta mencatat saldo aktual dari dashboard Kiro pada setiap fase.
+Angka 50 mengikuti Kiro Free tier yang tercantum pada halaman pricing saat materi dibuat. Konsumsi aktual tidak dapat dipastikan sebelum eksekusi karena dipengaruhi kompleksitas prompt, model, refinement, dan eksekusi task. Saldo sebenarnya selalu dilihat peserta di dashboard usage Kiro.
 
-Rekomendasi:
+Website menampilkan rekomendasi budget per fase, bukan tracker interaktif:
 
-- `0–19.99`: lanjutkan sesuai task.
-- `20–39.99`: prioritaskan vertical slice, lewati polish.
-- `40–49.99`: hentikan refinement dan gunakan hanya perbaikan terarah.
-- `≥50`: hentikan eksperimen sesuai guardrail.
+| Fase | Rekomendasi |
+|---|---|
+| Requirements | ≤ 6 |
+| Design | ≤ 6 |
+| Tasks | ≤ 4 |
+| Implementasi | ≤ 28 |
+| Validasi/fix | ≤ 6 |
+
+Bila sisa credit peserta sudah menipis, guide mengarahkan mereka berhenti melakukan refinement dan menyelesaikan implementasi dengan **Run all required tasks** sekali jalan, agar credit tersisa dipakai untuk menyelesaikan aplikasi. Eksekusi massal tetap memakai credit dan menghilangkan checkpoint per task, jadi ini langkah darurat, bukan default.
 
 ## Referensi resmi
 
