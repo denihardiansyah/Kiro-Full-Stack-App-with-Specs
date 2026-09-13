@@ -1,0 +1,461 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Kiro Builder Lab — static workshop guide served by nginx on Amazon ECS Fargate
+  behind an Application Load Balancer. Creates its own VPC with two public subnets.
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Application
+        Parameters:
+          - ProjectName
+          - ImageUri
+          - RepositoryCredentialsSecretArn
+          - DesiredCount
+          - TaskSize
+      - Label:
+          default: Networking and access
+        Parameters:
+          - VpcCidr
+          - AllowedCidr
+          - CertificateArn
+      - Label:
+          default: Observability
+        Parameters:
+          - LogRetentionInDays
+
+Parameters:
+  ProjectName:
+    Type: String
+    Default: kiro-builder-lab
+    AllowedPattern: '^[a-z][a-z0-9-]{2,20}[a-z0-9]$'
+    ConstraintDescription: >
+      Lowercase letters, digits, and hyphens; 4 to 22 characters; must not end with a hyphen.
+      Kept short because load balancer and target group names are limited to 32 characters.
+    Description: Lowercase name used as a prefix for created resources.
+
+  ImageUri:
+    Type: String
+    Description: >
+      Full container image reference including tag. Accepts Amazon ECR, for example
+      111122223333.dkr.ecr.ap-southeast-1.amazonaws.com/kiro-builder-lab:20260913120000,
+      or GitHub Container Registry, for example ghcr.io/owner/workshop-kiro:sha-abc123.
+    # Requires the tag in the final path segment so a registry port is not
+    # mistaken for a tag.
+    AllowedPattern: '^.+/[^/:]+:[^/:]+$'
+    ConstraintDescription: >
+      Must be a registry path with an explicit tag, for example
+      ghcr.io/owner/repo:sha-abc123.
+
+  RepositoryCredentialsSecretArn:
+    Type: String
+    Default: ''
+    Description: >
+      Optional AWS Secrets Manager secret ARN holding registry credentials, required
+      only when the image lives in a private registry such as a private GHCR package.
+      The secret value must be JSON with "username" and "password" keys. Leave empty
+      for Amazon ECR or for public GHCR packages.
+
+  DesiredCount:
+    Type: Number
+    Default: 2
+    MinValue: 1
+    MaxValue: 10
+    Description: Number of Fargate tasks. Two tasks spread across two AZs.
+
+  # Paired so an invalid Fargate CPU/memory combination cannot be selected.
+  TaskSize:
+    Type: String
+    Default: 256/512
+    AllowedValues:
+      - 256/512
+      - 256/1024
+      - 512/1024
+      - 512/2048
+      - 1024/2048
+      - 1024/4096
+    Description: Fargate task size as "CPU units/memory MiB".
+
+  VpcCidr:
+    Type: String
+    Default: 10.20.0.0/16
+    AllowedPattern: '^((25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(25[0-5]|2[0-4]\d|1?\d?\d)/(1[6-9]|2[0-2])$'
+    ConstraintDescription: >
+      Must be a valid IPv4 CIDR with a /16 to /22 prefix. The template carves four
+      /24 subnets out of it, which is not possible with a smaller block.
+    Description: CIDR block for the VPC created by this stack.
+
+  AllowedCidr:
+    Type: String
+    Default: 0.0.0.0/0
+    AllowedPattern: '^((25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(25[0-5]|2[0-4]\d|1?\d?\d)/(3[0-2]|[12]?\d)$'
+    ConstraintDescription: Must be a valid IPv4 CIDR, for example 203.0.113.0/24 or 0.0.0.0/0.
+    Description: >
+      Source CIDR allowed to reach the load balancer. The default exposes the guide
+      publicly. Restrict this if the workshop guide should not be internet-wide.
+
+  CertificateArn:
+    Type: String
+    Default: ''
+    Description: >
+      Optional ACM certificate ARN in this region. When provided, HTTPS is served on
+      443 and HTTP on 80 redirects to it. When empty, only plaintext HTTP is served.
+
+  LogRetentionInDays:
+    Type: Number
+    Default: 14
+    AllowedValues: [1, 3, 5, 7, 14, 30, 60, 90, 180, 365]
+    Description: CloudWatch Logs retention for container logs.
+
+Conditions:
+  HasCertificate: !Not [!Equals [!Ref CertificateArn, '']]
+  HasRepositoryCredentials: !Not [!Equals [!Ref RepositoryCredentialsSecretArn, '']]
+
+Resources:
+  # ---------------------------------------------------------------- networking
+  Vpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCidr
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-vpc'
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-igw'
+
+  InternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref Vpc
+      InternetGatewayId: !Ref InternetGateway
+
+  PublicSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref Vpc
+      AvailabilityZone: !Select [0, !GetAZs '']
+      CidrBlock: !Select [0, !Cidr [!Ref VpcCidr, 4, 8]]
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-public-a'
+
+  PublicSubnetB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref Vpc
+      AvailabilityZone: !Select [1, !GetAZs '']
+      CidrBlock: !Select [1, !Cidr [!Ref VpcCidr, 4, 8]]
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-public-b'
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref Vpc
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-public-rt'
+
+  DefaultPublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: InternetGatewayAttachment
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  PublicSubnetARouteAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnetA
+
+  PublicSubnetBRouteAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnetB
+
+  # ----------------------------------------------------------- security groups
+  LoadBalancerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: !Sub 'Ingress to the ${ProjectName} load balancer'
+      VpcId: !Ref Vpc
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: !Ref AllowedCidr
+          Description: HTTP from allowed clients
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-alb-sg'
+
+  LoadBalancerHttpsIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Condition: HasCertificate
+    Properties:
+      GroupId: !Ref LoadBalancerSecurityGroup
+      IpProtocol: tcp
+      FromPort: 443
+      ToPort: 443
+      CidrIp: !Ref AllowedCidr
+      Description: HTTPS from allowed clients
+
+  ServiceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: !Sub 'Ingress to ${ProjectName} tasks from the load balancer only'
+      VpcId: !Ref Vpc
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 8080
+          ToPort: 8080
+          SourceSecurityGroupId: !Ref LoadBalancerSecurityGroup
+          Description: nginx container port from the load balancer
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-service-sg'
+
+  # ------------------------------------------------------------ load balancing
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    DependsOn: InternetGatewayAttachment
+    Properties:
+      Name: !Sub '${ProjectName}-alb'
+      Type: application
+      Scheme: internet-facing
+      IpAddressType: ipv4
+      SecurityGroups:
+        - !Ref LoadBalancerSecurityGroup
+      Subnets:
+        - !Ref PublicSubnetA
+        - !Ref PublicSubnetB
+      LoadBalancerAttributes:
+        - Key: idle_timeout.timeout_seconds
+          Value: '60'
+        - Key: routing.http.drop_invalid_header_fields.enabled
+          Value: 'true'
+        - Key: deletion_protection.enabled
+          Value: 'false'
+
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub '${ProjectName}-tg'
+      VpcId: !Ref Vpc
+      TargetType: ip
+      Protocol: HTTP
+      Port: 8080
+      HealthCheckEnabled: true
+      HealthCheckProtocol: HTTP
+      HealthCheckPath: /healthz
+      HealthCheckIntervalSeconds: 15
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 3
+      Matcher:
+        HttpCode: '200'
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: '15'
+
+  HttpListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - !If
+          - HasCertificate
+          - Type: redirect
+            RedirectConfig:
+              Protocol: HTTPS
+              Port: '443'
+              Host: '#{host}'
+              Path: /#{path}
+              Query: '#{query}'
+              StatusCode: HTTP_301
+          - Type: forward
+            TargetGroupArn: !Ref TargetGroup
+
+  HttpsListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Condition: HasCertificate
+    Properties:
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 443
+      Protocol: HTTPS
+      SslPolicy: ELBSecurityPolicy-TLS13-1-2-2021-06
+      Certificates:
+        - CertificateArn: !Ref CertificateArn
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref TargetGroup
+
+  # -------------------------------------------------------------- ecs platform
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/ecs/${ProjectName}'
+      RetentionInDays: !Ref LogRetentionInDays
+
+  Cluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Sub '${ProjectName}-cluster'
+      ClusterSettings:
+        - Name: containerInsights
+          Value: enabled
+
+  # Pulls the image and writes logs. No application permissions are granted.
+  ExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - !Sub 'arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy'
+      # Granted only when pulling from a private registry. If the secret is encrypted
+      # with a customer managed KMS key, add kms:Decrypt on that key as well.
+      Policies: !If
+        - HasRepositoryCredentials
+        - - PolicyName: ReadRegistryCredentials
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action: secretsmanager:GetSecretValue
+                  Resource: !Ref RepositoryCredentialsSecretArn
+        - !Ref 'AWS::NoValue'
+
+  # The static site calls no AWS API, so the task role stays empty on purpose.
+  TaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub '${ProjectName}-web'
+      RequiresCompatibilities:
+        - FARGATE
+      NetworkMode: awsvpc
+      Cpu: !Select [0, !Split ['/', !Ref TaskSize]]
+      Memory: !Select [1, !Split ['/', !Ref TaskSize]]
+      ExecutionRoleArn: !GetAtt ExecutionRole.Arn
+      TaskRoleArn: !GetAtt TaskRole.Arn
+      RuntimePlatform:
+        CpuArchitecture: X86_64
+        OperatingSystemFamily: LINUX
+      ContainerDefinitions:
+        - Name: web
+          Image: !Ref ImageUri
+          Essential: true
+          RepositoryCredentials: !If
+            - HasRepositoryCredentials
+            - CredentialsParameter: !Ref RepositoryCredentialsSecretArn
+            - !Ref 'AWS::NoValue'
+          PortMappings:
+            - ContainerPort: 8080
+              Protocol: tcp
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref LogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: web
+
+  Service:
+    Type: AWS::ECS::Service
+    Metadata:
+      # DependsOn has no conditional form, so the ordering requirement for the
+      # HTTPS listener is expressed as an implicit dependency instead: the Ref
+      # below makes CloudFormation create HttpsListener first when a certificate
+      # is supplied, and disappears entirely when it is not. Without this, the
+      # service could be created before the only listener that forwards to the
+      # target group exists.
+      OptionalHttpsListenerDependency: !If
+        - HasCertificate
+        - !Ref HttpsListener
+        - !Ref 'AWS::NoValue'
+    DependsOn:
+      - HttpListener
+      - DefaultPublicRoute
+    Properties:
+      ServiceName: !Sub '${ProjectName}-service'
+      Cluster: !Ref Cluster
+      TaskDefinition: !Ref TaskDefinition
+      LaunchType: FARGATE
+      PlatformVersion: LATEST
+      DesiredCount: !Ref DesiredCount
+      HealthCheckGracePeriodSeconds: 30
+      DeploymentConfiguration:
+        MinimumHealthyPercent: 100
+        MaximumPercent: 200
+        DeploymentCircuitBreaker:
+          Enable: true
+          Rollback: true
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          # Public IPs let tasks reach ECR and CloudWatch without a NAT gateway.
+          # Inbound traffic is still restricted to the load balancer security group.
+          AssignPublicIp: ENABLED
+          Subnets:
+            - !Ref PublicSubnetA
+            - !Ref PublicSubnetB
+          SecurityGroups:
+            - !Ref ServiceSecurityGroup
+      LoadBalancers:
+        - ContainerName: web
+          ContainerPort: 8080
+          TargetGroupArn: !Ref TargetGroup
+
+Outputs:
+  SiteUrl:
+    Description: Public URL of the workshop guide.
+    Value: !If
+      - HasCertificate
+      - !Sub 'https://${LoadBalancer.DNSName}'
+      - !Sub 'http://${LoadBalancer.DNSName}'
+
+  LoadBalancerDnsName:
+    Description: ALB DNS name, useful as a CNAME target for a custom domain.
+    Value: !GetAtt LoadBalancer.DNSName
+
+  ClusterName:
+    Description: ECS cluster name.
+    Value: !Ref Cluster
+
+  ServiceName:
+    Description: ECS service name.
+    Value: !GetAtt Service.Name
+
+  LogGroupName:
+    Description: CloudWatch Logs group holding container logs.
+    Value: !Ref LogGroup

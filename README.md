@@ -91,6 +91,18 @@ workshop-kiro/
 ├── styles.css
 ├── app.js
 ├── README.md
+├── .dockerignore
+├── .github/
+│   └── workflows/
+│       └── publish-image.yml
+├── deploy/
+│   ├── Dockerfile
+│   ├── nginx.conf
+│   ├── security-headers.conf
+│   ├── infrastructure.yaml
+│   ├── deploy.sh
+│   ├── teardown.sh
+│   └── README.md
 └── .kiro/
     └── specs/
         └── task-tracker/
@@ -103,6 +115,8 @@ workshop-kiro/
 - `styles.css` — visual AWS Workshops-inspired, responsive, dark mode, dan print style.
 - `app.js` — navigasi, progress, clipboard, theme, dan credit tracker.
 - `.kiro/specs/task-tracker/` — spec scope-locked untuk aplikasi yang dibangun peserta.
+- `deploy/` — Dockerfile, nginx config, CloudFormation, dan script untuk deploy ke ECS Fargate.
+- `.github/workflows/publish-image.yml` — build image dan push ke GitHub Container Registry.
 
 ## Prerequisites peserta
 
@@ -414,6 +428,28 @@ Hentikan process hasil pencarian tersebut sebelum menjalankan `npm run dev` lagi
 ## Hosting website guide
 
 Folder guide dapat di-host apa adanya pada GitHub Pages, AWS Amplify Hosting, Amazon S3 + CloudFront, atau static hosting lain. Pastikan `index.html`, `styles.css`, dan `app.js` berada pada path yang sama.
+
+### Deploy ke AWS ECS Fargate
+
+Tersedia juga container image dan CloudFormation untuk menjalankan guide sebagai service nginx di ECS Fargate di belakang Application Load Balancer:
+
+```bash
+chmod +x deploy/deploy.sh deploy/teardown.sh
+./deploy/deploy.sh
+```
+
+Image dapat berasal dari dua tempat:
+
+- **Amazon ECR**, dibangun dari laptop oleh `deploy/deploy.sh` (default).
+- **GitHub Container Registry**, dibangun otomatis oleh workflow `.github/workflows/publish-image.yml`, lalu dipakai langsung oleh ECS:
+
+  ```bash
+  IMAGE_URI=ghcr.io/owner/workshop-kiro:sha-abc123 ./deploy/deploy.sh
+  ```
+
+Petunjuk lengkap, opsi konfigurasi, alur GHCR untuk package public maupun private, cara mengaktifkan HTTPS, troubleshooting, perbandingan biaya, dan cara menghapus resource ada di [`deploy/README.md`](deploy/README.md).
+
+Untuk situs statis seperti ini, S3 + CloudFront lebih murah karena Fargate dan ALB berbiaya tetap meski tidak ada pengunjung. Gunakan Fargate bila Anda memang ingin pola container/ECS.
 
 ## Guardrail credit
 

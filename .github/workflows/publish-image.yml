@@ -1,0 +1,92 @@
+name: Publish container image to GHCR
+
+# Builds the static guide image and pushes it to GitHub Container Registry so an
+# ECS task definition can reference ghcr.io/<owner>/<repo>:<tag> directly.
+#
+# GHCR packages are private by default. Either make the package public, or store
+# a token in AWS Secrets Manager and pass RepositoryCredentialsSecretArn to the
+# CloudFormation stack. See deploy/README.md.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - index.html
+      - styles.css
+      - app.js
+      - deploy/Dockerfile
+      - deploy/nginx.conf
+      - deploy/security-headers.conf
+      - .dockerignore
+      - .github/workflows/publish-image.yml
+  workflow_dispatch:
+
+concurrency:
+  group: publish-image-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      # GHCR requires a lowercase image path; repository names may contain uppercase.
+      - name: Compute image name
+        id: image
+        run: echo "name=${REGISTRY}/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Derive tags and labels
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ steps.image.outputs.name }}
+          tags: |
+            type=sha,format=long
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: deploy/Dockerfile
+          # Fargate runs X86_64 in this stack, so a single amd64 image is enough.
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          # Keep a plain single-platform manifest; ECS does not need attestations.
+          provenance: false
+          sbom: false
+
+      - name: Summary
+        run: |
+          {
+            echo "### Image published"
+            echo
+            echo 'Immutable reference for the ECS task definition:'
+            echo
+            echo '```text'
+            echo "${{ steps.image.outputs.name }}:sha-${GITHUB_SHA}"
+            echo '```'
+            echo
+            echo "All tags:"
+            echo '```text'
+            echo "${{ steps.meta.outputs.tags }}"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -1,0 +1,10 @@
+# Build context is the repository root; only the static site and nginx configs are needed.
+.git
+.github
+.kiro
+*.md
+
+# Exclude deployment tooling but keep the nginx configs referenced by the Dockerfile.
+deploy/*
+!deploy/nginx.conf
+!deploy/security-headers.conf
