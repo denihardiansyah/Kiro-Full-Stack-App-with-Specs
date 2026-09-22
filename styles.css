@@ -328,13 +328,13 @@ tr:last-child td { border-bottom: 0; }
 .app-preview__bar { display: flex; align-items: center; gap: 6px; padding: 10px 14px; background: var(--navy-850); }
 .app-preview__bar span { width: 10px; height: 10px; background: #56657d; border-radius: 50%; }
 .app-preview__bar em { margin-left: 10px; color: #9fb0c7; font-size: 11px; font-style: normal; }
-.app-preview__body { padding: 22px; background: var(--surface-alt); }
+.app-preview__body { padding: 22px; background: #eef1f5; }
 .app-preview__title { margin: 0 0 14px; font-size: 19px; font-weight: 800; }
 .app-preview__form { display: flex; gap: 8px; margin-bottom: 16px; }
 .app-preview__input { flex: 1; padding: 11px 13px; color: var(--ink-500); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); font-size: 13px; }
 .app-preview__button { padding: 11px 16px; color: #15100a; background: var(--orange-500); border-radius: var(--radius-sm); font-size: 13px; font-weight: 700; white-space: nowrap; }
 .app-preview__list { margin: 0; padding: 0; list-style: none; }
-.app-preview__list li { display: flex; align-items: center; gap: 10px; padding: 11px 13px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); font-size: 14px; }
+.app-preview__list li { display: flex; align-items: center; gap: 10px; padding: 11px 13px; background: #ffffff; border-radius: var(--radius-sm); font-size: 14px; }
 .app-preview__list li + li { margin-top: 7px; }
 .app-preview__list li.is-done .app-preview__label { color: var(--ink-500); text-decoration: line-through; }
 .app-preview__check { color: var(--green-500); font-size: 15px; }
@@ -354,7 +354,8 @@ tr:last-child td { border-bottom: 0; }
   .app-preview__bar { background: #eee; }
   .app-preview__bar em { color: #333; }
   .app-preview__body { color: #000; background: #fff; }
-  .app-preview__input, .app-preview__list li { background: #fff; border-color: #aaa; }
+  .app-preview__input { background: #fff; border-color: #aaa; }
+  .app-preview__list li { background: #fff; }
   .app-preview__button { color: #000; border: 1px solid #8a5200; }
   .app-preview__hint, .app-preview figcaption { color: #333; }
   .app-preview__input, .app-preview__state, .app-preview__list li.is-done .app-preview__label { color: #444; }

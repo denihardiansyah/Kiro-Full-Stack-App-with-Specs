@@ -254,7 +254,7 @@ Tujuan pengguna:
 2. Menambahkan task dengan judul wajib.
 3. Menandai task selesai atau belum selesai.
 
-Gunakan React dengan Vite untuk frontend, Node.js dengan Express untuk backend, dan penyimpanan in-memory. Aplikasi hanya satu halaman.
+Gunakan struktur monorepo dengan folder backend dan frontend. Backend memakai Node.js dengan Express dan penyimpanan in-memory. Frontend memakai React dengan Vite. Aplikasi hanya satu halaman.
 
 API dibatasi menjadi:
 - GET /api/tasks
@@ -283,18 +283,23 @@ Jangan tambahkan autentikasi, database cloud, deployment, Docker, state-manageme
             <li><div class="step-number">1</div><div><h2>Generate design</h2><p>Lanjutkan workflow Spec dan minta Kiro membuat <code>design.md</code>. Jika diminta konteks tambahan, gunakan prompt pembatas berikut.</p>
               <div class="code-block code-block--prompt"><div class="code-block__bar"><span>Prompt 2 · Design guardrail</span><button class="copy-button" type="button" data-copy-target="prompt-design">Copy prompt</button></div><pre id="prompt-design"><code>Buat design sesederhana mungkin untuk workshop pemula.
 
-Gunakan monorepo dengan folder client dan server, React hooks bawaan, native fetch, Express, dan array in-memory. Sertakan data flow, kontrak tiga endpoint, model Task, validasi, dan error handling.
+Gunakan monorepo dengan folder backend dan frontend. Backend hanya berisi API task (Express, array in-memory, tiga endpoint). Frontend hanya berisi halaman React (React hooks bawaan, native fetch) yang mengonsumsi API tersebut. Sertakan data flow, kontrak tiga endpoint, model Task, validasi, dan error handling.
 
-Hindari repository pattern, ORM, Docker, authentication, cloud services, dan abstraksi yang tidak diperlukan.</code></pre></div>
+Sertakan juga spesifikasi UI/UX yang konkret: struktur DOM halaman (judul, form, kartu, daftar task), token warna sebagai CSS variable, dan gaya task yang sudah selesai (strikethrough, warna pudar). Ini requirement wajib, bukan opsional.
+
+Hindari repository pattern, ORM, Docker, authentication, cloud services, UI framework/icon package, dan abstraksi yang tidak diperlukan.</code></pre></div>
             </div></li>
             <li><div class="step-number">2</div><div><h2>Cocokkan design dengan target</h2>
               <div class="diagram"><div><strong>TaskPage</strong><small>state & fetch</small></div><span>→</span><div><strong>TaskForm</strong><small>create task</small></div><span>+</span><div><strong>TaskList</strong><small>render & toggle</small></div></div>
               <div class="table-wrap"><table><thead><tr><th>Method</th><th>Path</th><th>Success</th><th>Error utama</th></tr></thead><tbody><tr><td><code>GET</code></td><td><code>/api/tasks</code></td><td>200 + array</td><td>500</td></tr><tr><td><code>POST</code></td><td><code>/api/tasks</code></td><td>201 + task</td><td>400 title kosong</td></tr><tr><td><code>PATCH</code></td><td><code>/api/tasks/:id/toggle</code></td><td>200 + task</td><td>404 not found</td></tr></tbody></table></div>
             </div></li>
-            <li><div class="step-number">3</div><div><h2>Approve design</h2><p>Approve bila design hanya memiliki komponen dan endpoint yang dibutuhkan. Periksa sisa credit di dashboard Kiro sebelum lanjut ke fase tasks.</p></div></li>
+            <li><div class="step-number">3</div><div><h2>Periksa spesifikasi UI/UX</h2><p>Pastikan <code>design.md</code> memuat struktur DOM (judul halaman, kartu, form, daftar task), token warna sebagai CSS variable, dan gaya task selesai (strikethrough + warna pudar). Ini bagian wajib, bukan pelengkap.</p></div></li>
+            <li><div class="step-number">4</div><div><h2>Approve design</h2><p>Approve bila design hanya memiliki komponen, endpoint, dan spesifikasi UI/UX yang dibutuhkan. Periksa sisa credit di dashboard Kiro sebelum lanjut ke fase tasks.</p></div></li>
           </ol>
 
-          <div class="checkpoint"><span>Checkpoint</span><strong><code>design.md</code> memetakan UI → API → storage dan sudah disetujui.</strong></div>
+          <aside class="callout callout--warning"><span class="callout__icon">!</span><div><strong>UI/UX bukan optional</strong><p>Tampilan aplikasi—judul, kartu, warna, status task selesai—adalah bagian dari requirement wajib workshop ini, bukan sekadar preview visual di halaman ini. Kalau Kiro melewatkan detail UI saat generate design, refine sekali dengan menyebut bagian ini secara spesifik sebelum lanjut ke fase tasks.</p></div></aside>
+
+          <div class="checkpoint"><span>Checkpoint</span><strong><code>design.md</code> memetakan UI → API → storage, termasuk spesifikasi UI/UX, dan sudah disetujui.</strong></div>
           <div class="module-check"><label><input type="checkbox" data-module-complete="design"><span>Design sudah direview dan approved.</span></label></div>
         </article>
 
@@ -304,10 +309,10 @@ Hindari repository pattern, ORM, Docker, authentication, cloud services, dan abs
           <ol class="steps">
             <li><div class="step-number">1</div><div><h2>Generate tasks</h2><p>Lanjutkan workflow untuk membuat <code>tasks.md</code>. Gunakan pembatas ini jika task terlalu banyak.</p>
               <div class="code-block code-block--prompt"><div class="code-block__bar"><span>Prompt 3 · Task plan guardrail</span><button class="copy-button" type="button" data-copy-target="prompt-tasks">Copy prompt</button></div><pre id="prompt-tasks"><code>Buat tepat lima required implementation tasks:
-1. Scaffold project dan shared scripts.
-2. Implementasikan in-memory store dan tiga endpoint Express.
-3. Implementasikan React UI dan state.
-4. Integrasikan UI dengan API termasuk loading, empty, validation, dan error state.
+1. Scaffold project dengan folder backend dan frontend beserta shared scripts.
+2. Implementasikan backend: in-memory store dan tiga endpoint Express.
+3. Implementasikan frontend: React UI dan state.
+4. Integrasikan frontend dengan backend termasuk loading, empty, validation, dan error state.
 5. Jalankan validasi build dan smoke test.
 
 Setiap task harus merujuk requirement terkait. Jangan menambahkan optional tasks, deployment, authentication, database, atau test framework baru.</code></pre></div>
@@ -333,7 +338,7 @@ Setiap task harus merujuk requirement terkait. Jangan menambahkan optional tasks
           <aside class="callout callout--danger"><span class="callout__icon">!</span><div><strong>Periksa saldo sebelum implementasi</strong><p>Buka dashboard usage Kiro. Jika sisa credit masih longgar, jalankan task satu per satu agar setiap diff bisa direview. Jika sisa credit sudah menipis, lewati polish, hentikan refinement, dan selesaikan dengan <strong>Run all required tasks</strong>.</p></div></aside>
 
           <div class="execution-list">
-            <div class="execution-item"><span>1</span><div><h2>Scaffold</h2><p>Jalankan task scaffolding. Hasil minimum: root scripts, <code>client/</code>, <code>server/</code>, dan dependency yang diperlukan.</p></div><em>Rekomendasi ≤ 4 credits</em></div>
+            <div class="execution-item"><span>1</span><div><h2>Scaffold</h2><p>Jalankan task scaffolding. Hasil minimum: root scripts, <code>backend/</code>, <code>frontend/</code>, dan dependency yang diperlukan.</p></div><em>Rekomendasi ≤ 4 credits</em></div>
             <div class="execution-item"><span>2</span><div><h2>Backend</h2><p>Jalankan task API. Review bahwa hanya tiga endpoint dibuat dan validasi title dilakukan di server.</p></div><em>Rekomendasi ≤ 7 credits</em></div>
             <div class="execution-item"><span>3</span><div><h2>Frontend</h2><p>Jalankan task UI. Review form, list, empty state, loading, dan pesan error.</p></div><em>Rekomendasi ≤ 9 credits</em></div>
             <div class="execution-item"><span>4</span><div><h2>Integration</h2><p>Jalankan task integrasi. Pastikan frontend menggunakan native <code>fetch</code> dan memperbarui state setelah create/toggle.</p></div><em>Rekomendasi ≤ 8 credits</em></div>
@@ -344,8 +349,8 @@ Setiap task harus merujuk requirement terkait. Jangan menambahkan optional tasks
           <div class="code-block code-block--prompt"><div class="code-block__bar"><span>Prompt 4 · Focused recovery</span><button class="copy-button" type="button" data-copy-target="prompt-recovery">Copy prompt</button></div><pre id="prompt-recovery"><code>Periksa implementasi saat ini terhadap requirements dan design task-tracker.
 
 Perbaiki hanya masalah yang menghalangi vertical slice berikut:
-- server dapat dijalankan,
-- client dapat dijalankan,
+- backend dapat dijalankan,
+- frontend dapat dijalankan,
 - daftar task dapat dimuat,
 - task valid dapat ditambahkan,
 - status task dapat di-toggle.
@@ -353,11 +358,26 @@ Perbaiki hanya masalah yang menghalangi vertical slice berikut:
 Jangan refactor, menambah dependency, mengubah styling, atau menambahkan fitur baru. Jelaskan file yang diubah setelah selesai.</code></pre></div>
 
           <h2>Jalankan aplikasi</h2>
-          <p>Pastikan terminal berada di root project yang berisi <code>package.json</code>, <code>client/</code>, dan <code>server/</code>. Pasang seluruh workspace dependency, lalu jalankan Client dan API:</p>
-          <div class="code-block"><div class="code-block__bar"><span>Terminal · project root</span><button class="copy-button" type="button" data-copy-target="cmd-run">Copy</button></div><pre id="cmd-run"><code>npm install
+          <p>Pastikan terminal berada di root project yang berisi <code>package.json</code>, <code>backend/</code>, dan <code>frontend/</code>. Pasang seluruh workspace dependency:</p>
+          <div class="code-block"><div class="code-block__bar"><span>Terminal · project root</span><button class="copy-button" type="button" data-copy-target="cmd-install">Copy</button></div><pre id="cmd-install"><code>npm install</code></pre></div>
+
+          <h3>Cara A — satu command (default)</h3>
+          <p>Dari root project:</p>
+          <div class="code-block"><div class="code-block__bar"><span>Terminal · project root</span><button class="copy-button" type="button" data-copy-target="cmd-run">Copy</button></div><pre id="cmd-run"><code>npm run dev</code></pre></div>
+          <p class="muted">Client dan API berjalan bersamaan dalam satu terminal lewat <code>concurrently</code>.</p>
+
+          <h3>Cara B — dua terminal, backend dulu</h3>
+          <p>Gunakan bila Cara A tidak berhasil, atau Anda ingin log backend dan frontend terpisah.</p>
+          <p><strong>Terminal 1 — backend lebih dulu:</strong></p>
+          <div class="code-block"><div class="code-block__bar"><span>Terminal 1 · backend</span><button class="copy-button" type="button" data-copy-target="cmd-run-server">Copy</button></div><pre id="cmd-run-server"><code>cd backend
 npm run dev</code></pre></div>
+          <p>Tunggu sampai log menunjukkan server aktif di port <code>3001</code>. <strong>Jangan lanjut sebelum backend aktif</strong>, karena Vite proxy pada frontend akan gagal terhubung.</p>
+          <p><strong>Terminal 2 — baru frontend:</strong></p>
+          <div class="code-block"><div class="code-block__bar"><span>Terminal 2 · frontend</span><button class="copy-button" type="button" data-copy-target="cmd-run-client">Copy</button></div><pre id="cmd-run-client"><code>cd frontend
+npm run dev</code></pre></div>
+
           <div class="table-wrap"><table><thead><tr><th>Komponen</th><th>URL</th><th>Fungsi</th></tr></thead><tbody><tr><td>React Client</td><td><code>http://localhost:5173</code></td><td>UI Task Tracker</td></tr><tr><td>Express API</td><td><code>http://localhost:3001/api/tasks</code></td><td>JSON task endpoint</td></tr></tbody></table></div>
-          <p>Buka <code>http://localhost:5173</code> di browser. Biarkan terminal tetap terbuka selama smoke test. Untuk menghentikan Client dan API, fokuskan terminal lalu tekan <code>Ctrl + C</code>.</p>
+          <p>Buka <code>http://localhost:5173</code> di browser. Biarkan terminal tetap terbuka selama smoke test — pada Cara B, kedua terminal harus tetap terbuka bersamaan. Untuk menghentikan, fokuskan terminal lalu tekan <code>Ctrl + C</code>.</p>
           <p class="muted">Pada macOS gunakan <code>Ctrl + C</code>, bukan <code>Cmd + C</code>. Jika port masih terpakai karena terminal lama tertutup, periksa dengan <code>lsof -ti :3001</code> pada macOS/Linux atau <code>Get-NetTCPConnection -LocalPort 3001</code> pada Windows PowerShell, lalu hentikan process tersebut setelah memastikan itu milik lab ini.</p>
           <aside class="callout callout--info"><span class="callout__icon">i</span><div><strong>Data tidak persistent</strong><p>Task disimpan pada array in-memory. Menghentikan atau me-restart API akan menghapus seluruh task; ini adalah acceptance criterion, bukan bug.</p></div></aside>
           <p class="muted">Development server adalah proses jangka panjang dan harus dijalankan manual pada terminal Kiro. Jangan mengubah port atau menambahkan CORS package; Vite proxy sudah diarahkan ke API port 3001.</p>
@@ -375,6 +395,7 @@ npm run dev</code></pre></div>
             <label><input type="checkbox" data-test-check><span><strong>Toggle status</strong><small>Status task berubah tanpa reload manual.</small></span></label>
             <label><input type="checkbox" data-test-check><span><strong>API failure</strong><small>UI menampilkan error ketika server dihentikan.</small></span></label>
             <label><input type="checkbox" data-test-check><span><strong>Restart resets data</strong><small>Setelah API dimulai ulang, daftar kembali kosong.</small></span></label>
+            <label><input type="checkbox" data-test-check><span><strong>UI sesuai design §9.5</strong><small>Kartu putih di tengah, task selesai bercoret dan pudar, error tampil sebagai kotak merah muda.</small></span></label>
           </div>
 
           <h2>Validasi build</h2>
@@ -386,7 +407,7 @@ npm run dev</code></pre></div>
 
 Setelah memperbaiki, jalankan kembali build satu kali dan ringkas perubahan.</code></pre></div>
 
-          <aside class="callout callout--tip"><span class="callout__icon">✓</span><div><strong>Definition of done</strong><p>Build berhasil, keenam smoke test dikonfirmasi peserta, dan implementasi tetap hanya memiliki satu entity, satu halaman, serta tiga endpoint. Build tanpa smoke test hanya berarti <em>implementation ready for acceptance</em>, belum spec complete.</p></div></aside>
+          <aside class="callout callout--tip"><span class="callout__icon">✓</span><div><strong>Definition of done</strong><p>Build berhasil, ketujuh smoke test dikonfirmasi peserta, dan implementasi tetap hanya memiliki satu entity, satu halaman, serta tiga endpoint. Build tanpa smoke test hanya berarti <em>implementation ready for acceptance</em>, belum spec complete.</p></div></aside>
           <div class="module-check"><label><input type="checkbox" data-module-complete="validation"><span>Smoke test selesai dan hasil sesuai acceptance criteria.</span></label></div>
         </article>
 

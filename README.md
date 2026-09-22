@@ -339,11 +339,39 @@ Npm workspaces akan memasang dependency root, client, dan server dari satu comma
 
 ### 3. Jalankan Client dan API
 
+Ada dua cara. Keduanya menghasilkan aplikasi yang sama; pilih salah satu.
+
+#### Cara A — satu command dari root (default)
+
 ```bash
 npm run dev
 ```
 
-Script root menjalankan keduanya melalui `concurrently`:
+Script root menjalankan Client dan API bersamaan lewat `concurrently` dalam satu terminal.
+
+#### Cara B — dua terminal terpisah, backend dulu
+
+Gunakan cara ini bila Cara A tidak berhasil, atau bila Anda ingin melihat log backend dan frontend secara terpisah.
+
+**Terminal 1 — jalankan backend lebih dulu:**
+
+```bash
+cd server
+npm run dev
+```
+
+Tunggu sampai muncul log bahwa server berjalan (biasanya menyebut port `3001`). **Jangan lanjut ke langkah berikutnya sebelum backend benar-benar aktif**, karena Vite proxy pada Client akan gagal terhubung jika API belum berjalan.
+
+**Terminal 2 — baru jalankan frontend:**
+
+```bash
+cd client
+npm run dev
+```
+
+Tunggu sampai muncul URL lokal dari Vite (biasanya `http://localhost:5173`).
+
+#### URL yang tersedia
 
 | Komponen | URL | Fungsi |
 |---|---|---|
@@ -352,7 +380,7 @@ Script root menjalankan keduanya melalui `concurrently`:
 
 Buka `http://localhost:5173` di browser.
 
-> Development server adalah proses jangka panjang. Jalankan secara manual pada terminal Kiro dan biarkan terminal tetap terbuka selama smoke test.
+> Development server adalah proses jangka panjang. Jalankan secara manual pada terminal Kiro dan biarkan terminal tetap terbuka selama smoke test. Pada Cara B, kedua terminal harus tetap terbuka bersamaan.
 
 ### 4. Hentikan aplikasi
 
@@ -486,3 +514,5 @@ Bila sisa credit peserta sudah menipis, guide mengarahkan mereka berhenti melaku
 - [Node.js Downloads](https://nodejs.org/en/download)
 
 Informasi produk dapat berubah. Periksa dokumentasi resmi sebelum workshop. Konten dari sumber resmi telah diparafrasekan untuk mematuhi ketentuan lisensi.
+
+DRY_RUN=true ./deploy/teardown.sh

@@ -56,9 +56,9 @@ Non-goals:
 Hanya package berikut yang boleh ditambahkan:
 
 - Root dev dependency: `concurrently`
-- Client dependencies: `react`, `react-dom`
-- Client dev dependencies: `vite`, `@vitejs/plugin-react`
-- Server dependency: `express`
+- Frontend dependencies: `react`, `react-dom`
+- Frontend dev dependencies: `vite`, `@vitejs/plugin-react`
+- Backend dependency: `express`
 
 Semua dependency harus disimpan sebagai versi exact tanpa prefix `^` atau `~`, menggunakan instalasi equivalent dengan npm `--save-exact`. Dependency lain dilarang kecuali spec diubah dan disetujui terlebih dahulu.
 
@@ -68,7 +68,7 @@ Semua dependency harus disimpan sebagai versi exact tanpa prefix `^` atau `~`, m
 kiro-task-tracker/
 ├── package.json
 ├── package-lock.json
-├── client/
+├── frontend/
 │   ├── package.json
 │   ├── index.html
 │   ├── vite.config.js
@@ -76,7 +76,7 @@ kiro-task-tracker/
 │       ├── main.jsx
 │       ├── App.jsx
 │       └── styles.css
-└── server/
+└── backend/
     ├── package.json
     └── src/
         └── index.js
@@ -84,8 +84,8 @@ kiro-task-tracker/
 
 Batas struktur:
 
-- Array task dan tiga route berada di `server/src/index.js`; jangan membuat controller, service, model, atau repository layer.
-- State dan komponen React berada di `client/src/App.jsx`; jangan membuat context, global store, atau route file.
+- Array task dan tiga route berada di `backend/src/index.js`; jangan membuat controller, service, model, atau repository layer.
+- State dan komponen React berada di `frontend/src/App.jsx`; jangan membuat context, global store, atau route file.
 - `package-lock.json` boleh dihasilkan otomatis oleh npm.
 - Source/configuration file lain dilarang kecuali spec diubah dan disetujui.
 
@@ -161,9 +161,9 @@ Semua error memakai `{ "message": "Human-readable message" }`. Malformed JSON da
 
 Tidak boleh menambahkan endpoint lain, termasuk `/health`.
 
-## 8. Server Design
+## 8. Backend Design
 
-`server/src/index.js` hanya:
+`backend/src/index.js` hanya:
 
 1. Mengimpor Express dan `randomUUID` dari `node:crypto`.
 2. Memasang `express.json()`.
@@ -174,11 +174,11 @@ Tidak boleh menambahkan endpoint lain, termasuk `/health`.
 
 Server tidak melakukan persistence, authentication, logging framework, pagination, CORS setup, atau abstraction layer.
 
-## 9. Client Design
+## 9. Frontend Design
 
 ### 9.1 Component Boundary
 
-Semua komponen berada dalam `client/src/App.jsx`:
+Semua komponen berada dalam `frontend/src/App.jsx`:
 
 ```text
 App / TaskPage
@@ -236,14 +236,73 @@ Satu mutation harus selesai sebelum mutation berikutnya. Form submit dan seluruh
 3. Data: render list dan status.
 4. Error: visible region dengan `role="alert"`.
 
+### 9.5 UI/UX Specification (Requirement 4a)
+
+Struktur DOM yang wajib diikuti pada `App.jsx`:
+
+```html
+<main class="page">
+  <div class="card">
+    <h1>Task Tracker</h1>
+
+    <div class="error" role="alert">...</div> <!-- hanya render saat error tidak kosong -->
+
+    <form class="task-form">
+      <input type="text" placeholder="Tulis judul task…" />
+      <button type="submit">Add task</button>
+    </form>
+
+    <div class="task-list">
+      <!-- loading -->
+      <p class="state-message">Loading tasks...</p>
+      <!-- atau empty -->
+      <p class="state-message">No tasks yet. Add your first task.</p>
+      <!-- atau daftar -->
+      <div class="task-item">
+        <input type="checkbox" />
+        <span class="task-title">Judul task</span>
+        <span class="task-status">selesai</span>
+      </div>
+    </div>
+  </div>
+</main>
+```
+
+Class name di atas adalah contoh; nama class boleh berbeda selama struktur visual (urutan elemen, hierarki, dan perilaku tampil) sama.
+
+Token warna wajib dipakai sebagai CSS variable di `frontend/src/styles.css`:
+
+```css
+:root {
+  --color-bg: #eef1f5;
+  --color-card: #ffffff;
+  --color-accent: #ff9900;
+  --color-text: #17212f;
+  --color-text-muted: #66758a;
+  --color-error-bg: #fde8e8;
+  --color-error-text: #c0392b;
+}
+```
+
+Layout:
+
+- `.page`: `min-height: 100vh`, `background: var(--color-bg)`, padding di sekeliling konten.
+- `.card`: `max-width: 640px`, `margin: 0 auto`, `background: var(--color-card)`, `border-radius: 12px`, padding internal, box-shadow tipis.
+- `.task-form`: `display: flex`, `gap` antar input dan button, input `flex: 1`.
+- `.task-item`: `display: flex`, `align-items: center`, `gap` antar checkbox/judul/status, judul `flex: 1`.
+- Task dengan `completed: true`: judul memakai `text-decoration: line-through` dan `color: var(--color-text-muted)`.
+- `.error`: `background: var(--color-error-bg)`, `color: var(--color-error-text)`, padding, border-radius, margin-bottom sebelum form.
+
+Responsif: pada lebar viewport di bawah 480px, `.task-form` boleh berubah menjadi `flex-direction: column` agar input dan button tidak berdesakan. Ini styling responsif dasar, bukan CSS framework, sehingga tidak melanggar Requirement 4a.11.
+
 ## 10. Development Scripts
 
-Root memakai npm workspaces `client` dan `server`.
+Root memakai npm workspaces `frontend` dan `backend`.
 
-- Root `npm run dev`: Client + API via `concurrently`.
-- Root `npm run build`: Vite Client build.
-- Client `npm run dev` dan `npm run build`.
-- Server `npm run dev` dengan Node watch mode dan `npm start` tanpa watch.
+- Root `npm run dev`: Frontend + Backend via `concurrently`.
+- Root `npm run build`: Vite Frontend build.
+- Frontend `npm run dev` dan `npm run build`.
+- Backend `npm run dev` dengan Node watch mode dan `npm start` tanpa watch.
 
 Vite mem-proxy `/api` ke `http://localhost:3001`. Jangan menambah lint, format, test, deploy, Docker, database, atau seed script.
 
@@ -264,6 +323,7 @@ Vite mem-proxy `/api` ke `http://localhost:3001`. Jangan menambah lint, format, 
 | 2 | POST contract, form, create, submitting state |
 | 3 | PATCH contract, item control, serialized toggle |
 | 4 | Error shape, role alert, no optimistic update |
+| 4a | UI/UX Specification §9.5: struktur DOM, token warna, layout |
 | 5 | Workspaces/scripts, build, in-memory, local-only |
 | 6 | Allowed dependencies, fixed tree, three endpoints, non-goals |
 
@@ -272,16 +332,17 @@ Vite mem-proxy `/api` ke `http://localhost:3001`. Jangan menambah lint, format, 
 1. `npm install` dari root berhasil.
 2. `npm run build` dari root berhasil.
 3. Peserta menjalankan `npm run dev` dari root.
-4. Peserta mengonfirmasi enam smoke test:
+4. Peserta mengonfirmasi tujuh smoke test:
    - Empty state tampil.
    - Task valid dapat dibuat.
    - Judul kosong ditolak.
    - Status dapat di-toggle.
    - Error tampil ketika API tidak tersedia.
    - Restart API mengosongkan task.
+   - Tampilan sesuai design §9.5.
 5. Scope check: satu entity, satu halaman, tiga endpoint, allowed exact dependencies, dan tidak ada item Out of Scope.
 
-Build berhasil hanya berarti **implementation ready for acceptance**. Spec berstatus **accepted/complete** setelah keenam smoke test manual berhasil dikonfirmasi.
+Build berhasil hanya berarti **implementation ready for acceptance**. Spec berstatus **accepted/complete** setelah ketujuh smoke test manual berhasil dikonfirmasi.
 
 ## 13. Scope Guard
 

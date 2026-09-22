@@ -68,6 +68,42 @@ Implementasi **MUST NOT** menambahkan fitur yang tidak dinyatakan di dokumen ini
 
 3.5. **WHEN** toggle berhasil, **THE SYSTEM SHALL** menampilkan status terbaru tanpa reload halaman manual.
 
+### Requirement 4a — Tampilan UI/UX
+
+**User Story:** Sebagai pengguna, saya ingin antarmuka yang rapi dan konsisten dengan referensi workshop agar aplikasi mudah dipahami tanpa dokumentasi tambahan.
+
+Requirement ini **wajib** dan bukan bagian optional. Semua acceptance criteria di bawah harus dipenuhi bersamaan dengan Requirement 1–3.
+
+#### Acceptance Criteria
+
+4a.1. **THE SYSTEM SHALL** menampilkan judul halaman `Task Tracker` di bagian atas.
+
+4a.2. **THE SYSTEM SHALL** menampilkan form tambah task berisi satu text input dengan placeholder `Tulis judul task…` dan satu tombol bertuliskan `Add task`, tersusun sejajar secara horizontal pada layar desktop.
+
+4a.3. **THE SYSTEM SHALL** menampilkan setiap task sebagai baris berisi checkbox atau kontrol toggle di sisi kiri, judul task di tengah, dan indikator status (`selesai` atau `belum selesai`) di sisi kanan.
+
+4a.4. **WHEN** sebuah task memiliki `completed: true`, **THE SYSTEM SHALL** menampilkan judul task dengan efek strikethrough (coret) dan warna teks yang lebih pudar dibanding task belum selesai.
+
+4a.5. **THE SYSTEM SHALL** membungkus form dan daftar task dalam satu kartu (card) dengan latar belakang berbeda dari latar halaman, sudut membulat, dan jarak antar-elemen yang konsisten.
+
+4a.6. **THE SYSTEM SHALL** menerapkan tema warna berikut secara konsisten di seluruh UI:
+
+- Warna aksen/tombol utama: oranye (`#ff9900`).
+- Warna latar halaman: abu-abu terang (`#eef1f5`).
+- Warna kartu: putih (`#ffffff`).
+- Warna teks utama: gelap (`#17212f`).
+- Warna teks task selesai: abu-abu (`#66758a`).
+
+4a.7. **THE SYSTEM SHALL** menampilkan halaman dengan lebar konten maksimum yang nyaman dibaca (tidak melebar penuh ke tepi browser pada layar besar) dan tetap dapat dibaca pada lebar layar mobile.
+
+4a.8. **WHEN** tidak ada task, **THE SYSTEM SHALL** menampilkan teks `No tasks yet. Add your first task.` pada area yang sama dengan daftar task, bukan sebagai pop-up atau alert browser.
+
+4a.9. **WHILE** daftar task sedang dimuat, **THE SYSTEM SHALL** menampilkan teks `Loading tasks...` pada area yang sama dengan daftar task.
+
+4a.10. **WHEN** terjadi error, **THE SYSTEM SHALL** menampilkan pesan error sebagai kotak berwarna merah muda dengan teks merah, ditampilkan di atas form, bukan sebagai `alert()` browser.
+
+4a.11. **THE SYSTEM SHALL NOT** menggunakan UI framework (contoh: Bootstrap, Material UI, Tailwind, Ant Design) atau icon package. Styling ditulis sebagai CSS biasa pada `frontend/src/styles.css` sesuai Requirement 6.4.
+
 ### Requirement 4 — Menangani kegagalan
 
 **User Story:** Sebagai pengguna, saya ingin mendapat informasi saat operasi gagal agar tidak mengira perubahan telah disimpan.
@@ -118,7 +154,7 @@ Implementasi **MUST NOT** menambahkan fitur yang tidak dinyatakan di dokumen ini
 
 6.5. **THE SYSTEM SHALL NOT** mengimplementasikan fitur yang tercantum pada bagian Out of Scope.
 
-6.6. **IF** sebuah keputusan implementasi tidak diperlukan untuk memenuhi Requirements 1–5, **THEN THE SYSTEM SHALL NOT** menambahkannya.
+6.6. **IF** sebuah keputusan implementasi tidak diperlukan untuk memenuhi Requirements 1–5 dan 4a, **THEN THE SYSTEM SHALL NOT** menambahkannya.
 
 ## 4. Out of Scope / Non-Goals
 
@@ -129,7 +165,7 @@ Item berikut secara eksplisit dilarang dalam implementasi workshop ini:
 - Deployment AWS/cloud, Infrastructure as Code, Docker, container, CI/CD, dan monitoring.
 - Entity selain Task; kategori, project, user, tag, comment, attachment, due date, atau priority.
 - Edit title, delete task, bulk action, filter, sort, search, pagination, dan real-time update.
-- Routing multi-page, global state library, UI component library, CSS framework, dan styling kompleks.
+- Routing multi-page, global state library, UI component library, CSS framework, dan styling di luar Requirement 4a.
 - GraphQL, WebSocket, caching layer, background job, dan third-party API.
 - Test framework baru, coverage tooling, atau end-to-end test suite. Validasi workshop dibatasi pada build dan smoke test manual.
 - Endpoint selain tiga endpoint pada Requirement 6.3, termasuk health endpoint.
